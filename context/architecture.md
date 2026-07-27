@@ -38,6 +38,12 @@
 - Supabase row-level security restricts profiles, saved wardrobe records, and stored result images to their owner.
 - Vendor credentials remain server-side environment variables and are never bundled into the Next.js app or extension.
 
+## Vendor Documentation Gate
+
+- The canonical vendor links and integration constraints live in [`api-references.md`](api-references.md).
+- Before changing a vendor client, endpoint, model, file requirement, polling rule, or moderation threshold, read the relevant official API documentation and update `api-references.md` when the provider has changed its contract or limitations.
+- Google Cloud Vision SafeSearch is an NSFW/explicit-content gate, not a minor/age detector. It cannot alone support a claim that minors are detected or blocked; that requires a separate approved control.
+
 ## Safety-First Data Flow
 
 1. The extension collects a candidate garment image and textual metadata, then displays a thumbnail confirmation.

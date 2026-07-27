@@ -67,6 +67,7 @@ Update this file after every meaningful implementation change.
 - [ ] Confirm the approved image upload size and formats for the chosen YouCam API plan.
 - [ ] Confirm whether Fit-Physics Notes are streamed by the backend or returned once complete for the MVP.
 - [ ] Confirm the extension authentication handoff design for the hackathon demo.
+- [ ] Select and approve a separate minor-protection control if the product must enforce “no minors processed”; Google Cloud Vision SafeSearch alone does not provide age/minor detection.
 
 ## Architecture Decisions
 

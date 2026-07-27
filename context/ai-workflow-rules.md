@@ -4,6 +4,8 @@
 
 Build TrueFit incrementally and spec-first. Read `context/project-overview.md`, `context/architecture.md`, `context/code-standards.md`, and `context/ui-context.md` before proposing or implementing a feature. Use `context/progress-tracker.md` to select the current task and update it after meaningful work.
 
+Before modifying a Perfect Corp YouCam, Google Gemini, or Google Cloud Vision integration, read the corresponding official link in `context/api-references.md`. Treat that file as the source of truth for current endpoints, versions, limits, and documented limitations.
+
 ## Scoping Rules
 
 - Work on one verifiable feature unit at a time.
@@ -19,6 +21,7 @@ Build TrueFit incrementally and spec-first. Read `context/project-overview.md`, 
 - Never write a raw user photo, unapproved image, or unsaved generated image to disk, persistent extension storage, logs, database, or object storage.
 - Use memory-only uploads and explicitly release transient buffers/references after success, failure, timeout, or cancellation.
 - Treat missing, malformed, timed-out, ambiguous, or failed moderation as unsafe. Stop the request and return a safe error.
+- Do not represent Google Cloud Vision SafeSearch as minor or age detection. SafeSearch alone cannot enforce a no-minors requirement.
 - Do not expose vendor credentials, full third-party errors, raw prompts containing user data, or bearer tokens.
 
 ## When to Split Work
