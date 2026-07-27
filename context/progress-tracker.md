@@ -1,0 +1,77 @@
+# Progress Tracker
+
+Update this file after every meaningful implementation change.
+
+## Current Phase
+
+- Planning and foundation setup
+
+## Current Goal
+
+- Establish the secure data model and implementation foundations for the hackathon MVP.
+
+## Database Schema
+
+- [ ] Create Supabase project configuration and environment-variable templates.
+- [ ] Configure Supabase Auth for the Next.js app and Chrome extension flow.
+- [ ] Create `profiles` table for height, usual size, fit preferences, and onboarding completion.
+- [ ] Create a consent record/table for explicit photo-use acceptance and timestamp.
+- [ ] Create saved wardrobe/result tables with user ownership, garment metadata, Fit-Physics Note, and result-image path.
+- [ ] Write row-level security policies for every user-owned table and storage object.
+- [ ] Configure private result-image storage paths scoped to the authenticated user.
+- [ ] Create migrations and seed/demo data appropriate for the hackathon demo.
+
+## Express Proxy
+
+- [ ] Scaffold TypeScript Express service with health endpoint, typed configuration, and centralized error middleware.
+- [ ] Add Supabase JWT validation middleware for protected routes.
+- [ ] Add consent, file-size, MIME-type, and supported-garment validation.
+- [ ] Configure Multer memory storage; confirm no upload path or disk storage is present.
+- [ ] Implement Google Cloud Vision SafeSearch service for input images.
+- [ ] Add the pre-generation moderation gate with fail-closed responses.
+- [ ] Implement Perfect Corp YouCam submission and bounded asynchronous polling service.
+- [ ] Implement generated-image SafeSearch moderation gate and transient buffer cleanup.
+- [ ] Implement Gemini Fit-Physics Note service using approved garment metadata and user profile fields.
+- [ ] Create a single authenticated generate-try-on endpoint with stable request/response contracts.
+- [ ] Add integration tests for approved, unsafe, malformed, timeout, and vendor-failure paths.
+
+## Next.js Web App
+
+- [ ] Scaffold the Next.js TypeScript application and shared styling foundation.
+- [ ] Connect Supabase authentication and protected-route handling.
+- [ ] Build explicit safety consent screen.
+- [ ] Build base-photo guidance and upload experience (front-facing, fully clothed, hair tied back).
+- [ ] Build body-profile form for height, usual size, and fit preferences.
+- [ ] Persist onboarding completion and profile data in Supabase.
+- [ ] Build saved wardrobe gallery with owner-scoped query and result cards.
+- [ ] Add saved-item detail view with image, garment data, Fit-Physics Note, and delete/save controls as scoped.
+- [ ] Add friendly empty, loading, error, and blocked states.
+
+## Chrome Extension
+
+- [ ] Scaffold Manifest V3 extension with content script, popup/panel, and secure API configuration.
+- [ ] Implement page-local detection of a candidate primary garment image.
+- [ ] Implement extraction of available garment metadata: title, fabric composition, size-chart hints, and source URL.
+- [ ] Add supported-garment classification and a safe unsupported/uncertain state.
+- [ ] Build thumbnail confirmation flow; prevent generation until the user confirms.
+- [ ] Integrate authenticated request to the Express proxy.
+- [ ] Build the split-screen result panel: visual canvas left, Fit-Physics Note right.
+- [ ] Add aspect-ratio-preserving skeleton loader and stage messaging for API latency.
+- [ ] Add Fit-Physics Note streaming/progressive rendering state.
+- [ ] Add safe blocked, retryable failure, cancel, save-to-wardrobe, and close/cleanup actions.
+- [ ] Test the demo flow on at least one supported product page.
+
+## Open Questions
+
+- [ ] Confirm the exact Supabase Storage retention and deletion policy for saved wardrobe images.
+- [ ] Confirm the approved image upload size and formats for the chosen YouCam API plan.
+- [ ] Confirm whether Fit-Physics Notes are streamed by the backend or returned once complete for the MVP.
+- [ ] Confirm the extension authentication handoff design for the hackathon demo.
+
+## Architecture Decisions
+
+- [ ] No implementation decisions recorded yet.
+
+## Session Notes
+
+- [ ] Initial Six-File Context Methodology files created; all build tasks remain To Do.
