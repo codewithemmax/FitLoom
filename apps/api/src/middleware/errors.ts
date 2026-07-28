@@ -7,7 +7,9 @@ export const notFoundHandler: RequestHandler = (_request, response): void => {
   response.status(404).json(createFailure('NOT_FOUND', 'Route not found.'));
 };
 
-export const errorHandler: ErrorRequestHandler = (error: unknown, _request, response, _next): void => {
+export const errorHandler: ErrorRequestHandler = (error: unknown, _request, response, next): void => {
+  void next;
+
   if (error instanceof AppError) {
     response.status(error.statusCode).json(createFailure(error.code, error.message));
     return;

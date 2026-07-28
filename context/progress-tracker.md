@@ -23,8 +23,8 @@ Update this file after every meaningful implementation change.
 
 ## Express Proxy
 
-- [ ] Scaffold TypeScript Express service with health endpoint, typed configuration, and centralized error middleware.
-- [ ] Add Supabase JWT validation middleware for protected routes.
+- [x] Scaffold TypeScript Express service with health endpoint, typed configuration, and centralized error middleware.
+- [x] Add Supabase JWT validation middleware for protected routes.
 - [ ] Add consent, file-size, MIME-type, and supported-garment validation.
 - [ ] Configure Multer memory storage; confirm no upload path or disk storage is present.
 - [ ] Implement Google Cloud Vision SafeSearch service for input images.
@@ -71,8 +71,9 @@ Update this file after every meaningful implementation change.
 
 ## Architecture Decisions
 
-- [ ] No implementation decisions recorded yet.
+- [x] Unit 01 backend foundation implemented with versioned `/api/v1` protected routes, Supabase-token-derived request identity, Zod request/response contracts, and a consistent JSON envelope.
 
 ## Session Notes
 
 - [ ] Initial Six-File Context Methodology files created; all build tasks remain To Do.
+- [x] Unit 01 verified with typecheck, lint, and unit tests.

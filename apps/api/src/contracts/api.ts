@@ -1,16 +1,32 @@
 import { z } from 'zod';
 
+export const errorCodes = [
+  'AUTH_REQUIRED',
+  'INVALID_REQUEST',
+  'NOT_FOUND',
+  'INTERNAL_ERROR',
+] as const;
+
+export type ErrorCode = (typeof errorCodes)[number];
+
 export const apiErrorSchema = z.object({
-  code: z.string().min(1),
+  code: z.enum(errorCodes),
   message: z.string().min(1),
 });
 
-export const successEnvelope = <T extends z.ZodType>(data: T) =>
+export const successEnvelope = <T extends z.ZodType>(data: T): z.ZodObject<{ data: T; error: z.ZodNull }> =>
   z.object({ data, error: z.null() });
 
 export const errorEnvelope = z.object({
   data: z.null(),
   error: apiErrorSchema,
+});
+
+export const createSuccess = <T>(data: T): ApiSuccess<T> => ({ data, error: null });
+
+export const createFailure = (code: ErrorCode, message: string): ApiFailure => ({
+  data: null,
+  error: { code, message },
 });
 
 export const generateTryOnRequestSchema = z.object({
@@ -38,4 +54,4 @@ export const generateTryOnResponseSchema = z.object({
 export type GenerateTryOnResponse = z.infer<typeof generateTryOnResponseSchema>;
 
 export type ApiSuccess<T> = { data: T; error: null };
-export type ApiFailure = { data: null; error: { code: string; message: string } };
+export type ApiFailure = { data: null; error: { code: ErrorCode; message: string } };
