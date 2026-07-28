@@ -8,6 +8,8 @@ export const errorCodes = [
   'SAFETY_BLOCKED',
   'TRY_ON_FAILED',
   'TRY_ON_TIMEOUT',
+  'FIT_NOTE_FAILED',
+  'SAVE_FAILED',
 ] as const;
 
 export type ErrorCode = (typeof errorCodes)[number];
@@ -38,15 +40,30 @@ export const tryOnMetadataSchema = z.object({
   garmentTitle: z.string().trim().min(1).max(200),
   garmentSourceUrl: z.string().url().max(2048),
   garmentConfirmed: z.literal('true').or(z.literal(true)),
+  garmentCut: z.string().trim().max(200).optional(),
+  height: z.string().trim().max(80).optional(),
+  usualSize: z.string().trim().max(80).optional(),
+  fitPreferences: z.string().trim().max(1000).optional(),
   composition: z.string().trim().max(1000).optional(),
   sizeChartHints: z.string().trim().max(2000).optional(),
 });
 
 export type TryOnMetadata = z.infer<typeof tryOnMetadataSchema>;
 
+export const fitPhysicsNoteSchema = z.object({
+  summary: z.string().min(1),
+  stretch: z.string().min(1),
+  structure: z.string().min(1),
+  pressurePoints: z.array(z.string().min(1)),
+  uncertainty: z.string().min(1),
+  disclaimer: z.literal('Guidance only; not a physical-fit or size guarantee.'),
+});
+
 export const tryOnResponseSchema = z.object({
+  resultId: z.string().uuid(),
   imageBase64: z.string().min(1),
   mimeType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
+  fitPhysicsNote: fitPhysicsNoteSchema,
 });
 
 export type TryOnResponse = z.infer<typeof tryOnResponseSchema>;

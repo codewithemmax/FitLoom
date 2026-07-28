@@ -31,7 +31,7 @@ Update this file after every meaningful implementation change.
 - [x] Add the pre-generation moderation gate with fail-closed responses.
 - [x] Implement Perfect Corp YouCam submission and bounded asynchronous polling service.
 - [x] Implement generated-image SafeSearch moderation gate and transient buffer cleanup.
-- [ ] Implement Gemini Fit-Physics Note service using approved garment metadata and user profile fields.
+- [x] Implement Gemini Fit-Physics Note service using approved garment metadata and user profile fields.
 - [x] Create a single authenticated try-on endpoint with stable request/response contracts.
 - [x] Add integration tests for approved, unsafe, malformed, timeout, and vendor-failure paths.
 
@@ -65,7 +65,7 @@ Update this file after every meaningful implementation change.
 
 - [ ] Confirm the exact Supabase Storage retention and deletion policy for saved wardrobe images.
 - [ ] Confirm the approved image upload size and formats for the chosen YouCam API plan.
-- [ ] Confirm whether Fit-Physics Notes are streamed by the backend or returned once complete for the MVP.
+- [x] Confirm whether Fit-Physics Notes are streamed by the backend or returned once complete for the MVP. Notes are returned once complete for the MVP.
 - [ ] Confirm the extension authentication handoff design for the hackathon demo.
 - [ ] Select and approve a separate minor-protection control if the product must enforce “no minors processed”; Google Cloud Vision SafeSearch alone does not provide age/minor detection.
 
@@ -78,3 +78,4 @@ Update this file after every meaningful implementation change.
 - [ ] Initial Six-File Context Methodology files created; all build tasks remain To Do.
 - [x] Unit 01 verified with typecheck, lint, and unit tests.
 - [x] Unit 02 safety pipeline implemented with pre/post SafeSearch gates, bounded YouCam polling, safe error envelopes, and request-scoped media cleanup tests.
+- [x] Unit 03 implemented with typed Gemini fit-note generation, session-scoped approved results, explicit owner-scoped save, and cleanup-on-failed-save tests.

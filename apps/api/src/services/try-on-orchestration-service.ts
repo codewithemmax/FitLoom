@@ -1,22 +1,33 @@
 import { AppError } from '../errors/app-error.js';
+import type { CurrentResultStore } from './current-result-store.js';
+import type { FitNoteService, FitPhysicsNote } from './fit-note-service.js';
 import type { SafeSearchService } from './safe-search-service.js';
 import type { YouCamClient, YouCamTaskResult } from '../vendor/youcam-client.js';
 
 export type TryOnInput = {
+  userId: string;
   basePhoto: Buffer;
   garmentImage: Buffer;
   garmentCategory: 'top' | 'outerwear';
   metadata: {
     title: string;
     sourceUrl: string;
+    cut?: string;
     composition?: string;
     sizeChartHints?: string;
+  };
+  profile?: {
+    height?: string;
+    usualSize?: string;
+    fitPreferences?: string;
   };
 };
 
 export type TryOnResult = {
+  resultId: string;
   imageBase64: string;
   mimeType: YouCamTaskResult['mimeType'];
+  fitPhysicsNote: FitPhysicsNote;
 };
 
 export type TryOnServiceOptions = {
@@ -37,6 +48,8 @@ const wait = async (milliseconds: number): Promise<void> => {
 export const createTryOnOrchestrationService = (
   safeSearchService: SafeSearchService,
   youCamClient: YouCamClient,
+  fitNoteService: FitNoteService,
+  currentResultStore: CurrentResultStore,
   options: TryOnServiceOptions,
 ): TryOnOrchestrationService => ({
   async generateTryOn(input: TryOnInput): Promise<TryOnResult> {
@@ -72,9 +85,24 @@ export const createTryOnOrchestrationService = (
             throw new AppError(422, 'SAFETY_BLOCKED', 'The generated result could not be approved for return.');
           }
 
-          return {
-            imageBase64: generatedImage.toString('base64'),
+          const fitPhysicsNote = await fitNoteService.createFitNote({
+            garment: { category: input.garmentCategory, ...input.metadata },
+            ...(input.profile === undefined ? {} : { profile: input.profile }),
+          });
+          const imageBase64 = generatedImage.toString('base64');
+          const storedResult = currentResultStore.put({
+            userId: input.userId,
+            imageBase64,
             mimeType: taskState.result.mimeType,
+            fitPhysicsNote,
+            garment: { category: input.garmentCategory, ...input.metadata },
+          });
+
+          return {
+            resultId: storedResult.id,
+            imageBase64,
+            mimeType: taskState.result.mimeType,
+            fitPhysicsNote,
           };
         }
 

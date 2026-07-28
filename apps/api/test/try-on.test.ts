@@ -5,7 +5,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createApp } from '../src/app.js';
 import type { SafeSearchOutcome, SafeSearchService } from '../src/services/safe-search-service.js';
-import { createTryOnOrchestrationService } from '../src/services/try-on-orchestration-service.js';
+import { createInMemoryCurrentResultStore } from '../src/services/current-result-store.js';
+import type { FitNoteService } from '../src/services/fit-note-service.js';
+import { createTryOnOrchestrationService, type TryOnOrchestrationService } from '../src/services/try-on-orchestration-service.js';
 import type { SupabaseAuthService } from '../src/services/supabase-auth-service.js';
 import type { YouCamClient } from '../src/vendor/youcam-client.js';
 
@@ -14,6 +16,25 @@ const authService: SupabaseAuthService = {
 };
 
 const imageBuffer = Buffer.from('fixture-image');
+
+const fitPhysicsNote = {
+  summary: 'This should fit with moderate confidence and some uncertainty.',
+  stretch: 'The fabric may provide limited stretch depending on blend.',
+  structure: 'The garment structure may hold shape around seams.',
+  pressurePoints: ['Shoulders may feel closer if layered.'],
+  uncertainty: 'Actual fit can vary by pattern, size chart, and posture.',
+  disclaimer: 'Guidance only; not a physical-fit or size guarantee.' as const,
+};
+
+const createFitNoteService = (): FitNoteService => ({
+  createFitNote: vi.fn(async () => fitPhysicsNote),
+});
+
+const createTryOnService = (safeSearch: SafeSearchService, youCamClient: YouCamClient): TryOnOrchestrationService =>
+  createTryOnOrchestrationService(safeSearch, youCamClient, createFitNoteService(), createInMemoryCurrentResultStore(), {
+    pollIntervalMs: 0,
+    timeoutMs: 50,
+  });
 
 const createSafeSearch = (outcomes: SafeSearchOutcome[]): SafeSearchService => ({
   moderateImage: vi.fn(async (): Promise<SafeSearchOutcome> => outcomes.shift() ?? 'indeterminate'),
@@ -49,10 +70,7 @@ describe('try-on safety orchestration', (): void => {
 
   it('rejects unsupported categories and incomplete confirmation before vendor calls', async (): Promise<void> => {
     const youCamClient = createSuccessfulYouCamClient();
-    const tryOnService = createTryOnOrchestrationService(createSafeSearch(['safe', 'safe', 'safe']), youCamClient, {
-      pollIntervalMs: 0,
-      timeoutMs: 50,
-    });
+    const tryOnService = createTryOnService(createSafeSearch(['safe', 'safe', 'safe']), youCamClient);
     const app = createApp({ authService, tryOnService });
 
     const response = await request(app)
@@ -72,11 +90,9 @@ describe('try-on safety orchestration', (): void => {
 
   it('blocks unsafe or indeterminate input before YouCam is called and cleans buffers', async (): Promise<void> => {
     const youCamClient = createSuccessfulYouCamClient();
-    const tryOnService = createTryOnOrchestrationService(createSafeSearch(['safe', 'indeterminate']), youCamClient, {
-      pollIntervalMs: 0,
-      timeoutMs: 50,
-    });
+    const tryOnService = createTryOnService(createSafeSearch(['safe', 'indeterminate']), youCamClient);
     const input = {
+      userId: 'verified-user-id',
       basePhoto: Buffer.from('base'),
       garmentImage: Buffer.from('garment'),
       garmentCategory: 'top' as const,
@@ -90,10 +106,7 @@ describe('try-on safety orchestration', (): void => {
   });
 
   it('never returns unsafe generated output', async (): Promise<void> => {
-    const tryOnService = createTryOnOrchestrationService(createSafeSearch(['safe', 'safe', 'unsafe']), createSuccessfulYouCamClient(), {
-      pollIntervalMs: 0,
-      timeoutMs: 50,
-    });
+    const tryOnService = createTryOnService(createSafeSearch(['safe', 'safe', 'unsafe']), createSuccessfulYouCamClient());
     const app = createApp({ authService, tryOnService });
 
     const response = await sendValidTryOnRequest(app);
@@ -108,7 +121,7 @@ describe('try-on safety orchestration', (): void => {
       createTryOnTask: vi.fn(async (): Promise<{ taskId: string }> => ({ taskId: 'task-1' })),
       getTryOnTask: vi.fn(async (): Promise<{ status: 'running' }> => ({ status: 'running' })),
     };
-    const tryOnService = createTryOnOrchestrationService(createSafeSearch(['safe', 'safe']), youCamClient, {
+    const tryOnService = createTryOnOrchestrationService(createSafeSearch(['safe', 'safe']), youCamClient, createFitNoteService(), createInMemoryCurrentResultStore(), {
       pollIntervalMs: 1,
       timeoutMs: 2,
     });
@@ -126,16 +139,15 @@ describe('try-on safety orchestration', (): void => {
   it('allows an approved request through input moderation, YouCam, and output moderation', async (): Promise<void> => {
     const safeSearch = createSafeSearch(['safe', 'safe', 'safe']);
     const youCamClient = createSuccessfulYouCamClient();
-    const tryOnService = createTryOnOrchestrationService(safeSearch, youCamClient, {
-      pollIntervalMs: 0,
-      timeoutMs: 50,
-    });
+    const tryOnService = createTryOnService(safeSearch, youCamClient);
     const app = createApp({ authService, tryOnService });
 
     const response = await sendValidTryOnRequest(app);
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({ data: { imageBase64: imageBuffer.toString('base64'), mimeType: 'image/png' }, error: null });
+    expect(response.body.data).toMatchObject({ imageBase64: imageBuffer.toString('base64'), mimeType: 'image/png', fitPhysicsNote });
+    expect(response.body.data.resultId).toEqual(expect.any(String));
+    expect(response.body.error).toBeNull();
     expect(safeSearch.moderateImage).toHaveBeenCalledTimes(3);
     expect(youCamClient.createTryOnTask).toHaveBeenCalledTimes(1);
     expect(youCamClient.getTryOnTask).toHaveBeenCalledTimes(1);

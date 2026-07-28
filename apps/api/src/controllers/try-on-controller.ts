@@ -24,18 +24,33 @@ export const createTryOnController = (tryOnService: TryOnOrchestrationService): 
         return;
       }
 
+      const userId = request.auth?.userId;
+      if (userId === undefined) {
+        response.status(500).json(createFailure('INTERNAL_ERROR', 'An unexpected error occurred.'));
+        return;
+      }
+
       const requestMetadata = {
         title: metadata.data.garmentTitle,
         sourceUrl: metadata.data.garmentSourceUrl,
+        ...(metadata.data.garmentCut === undefined ? {} : { cut: metadata.data.garmentCut }),
         ...(metadata.data.composition === undefined ? {} : { composition: metadata.data.composition }),
         ...(metadata.data.sizeChartHints === undefined ? {} : { sizeChartHints: metadata.data.sizeChartHints }),
       };
 
+      const requestProfile = {
+        ...(metadata.data.height === undefined ? {} : { height: metadata.data.height }),
+        ...(metadata.data.usualSize === undefined ? {} : { usualSize: metadata.data.usualSize }),
+        ...(metadata.data.fitPreferences === undefined ? {} : { fitPreferences: metadata.data.fitPreferences }),
+      };
+
       const result = await tryOnService.generateTryOn({
+        userId,
         basePhoto: basePhoto.buffer,
         garmentImage: garmentImage.buffer,
         garmentCategory: metadata.data.garmentCategory,
         metadata: requestMetadata,
+        ...(Object.keys(requestProfile).length === 0 ? {} : { profile: requestProfile }),
       });
 
       response.status(200).json(createSuccess(result));
