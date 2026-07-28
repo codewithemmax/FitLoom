@@ -1,9 +1,13 @@
-import type { User } from '@supabase/supabase-js';
+import type { UploadedMemoryFile } from '../middleware/memory-upload.js';
 
 declare global {
   namespace Express {
     interface Request {
-      identity?: Pick<User, 'id' | 'role'>;
+      auth?: {
+        userId: string;
+      };
+      uploadedFiles?: Partial<Record<UploadedMemoryFile['fieldName'], UploadedMemoryFile>>;
+      uploadedFields?: Record<string, string>;
     }
   }
 }
