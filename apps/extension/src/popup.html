@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TrueFit</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <p class="eyebrow">TrueFit extension</p>
+      <h1>Confirm a garment try-on</h1>
+      <p class="lede">Detected page content is treated as untrusted and must be confirmed before generation.</p>
+    </header>
+
+    <section class="status" id="status" role="status" aria-live="polite">Ready to scan this page.</section>
+
+    <section class="controls" aria-label="Session setup">
+      <label for="apiToken">Supabase access token (session only)</label>
+      <input id="apiToken" type="password" autocomplete="off" placeholder="Paste access token" />
+      <label for="basePhoto">Base photo (front-facing, fully clothed, hair tied back)</label>
+      <input id="basePhoto" type="file" accept="image/png,image/jpeg,image/webp" />
+      <button id="detectButton" type="button">Detect garment</button>
+    </section>
+
+    <section id="confirmPanel" class="card hidden" aria-labelledby="confirm-title">
+      <h2 id="confirm-title">Confirm detected item</h2>
+      <img id="candidateImage" alt="Detected garment thumbnail" />
+      <dl>
+        <dt>Title</dt><dd id="candidateTitle"></dd>
+        <dt>Category</dt><dd id="candidateCategory"></dd>
+        <dt>Material details</dt><dd id="candidateMetadata"></dd>
+      </dl>
+      <div class="button-row">
+        <button id="confirmButton" type="button">Confirm garment</button>
+        <button id="cancelButton" class="secondary" type="button">Cancel</button>
+      </div>
+      <button id="generateButton" type="button" disabled>Generate Fit</button>
+    </section>
+
+    <section id="resultPanel" class="result hidden" aria-labelledby="result-title">
+      <div class="visual-pane">
+        <h2 id="result-title">Approved visual result</h2>
+        <div id="visualSkeleton" class="result-skeleton hidden" aria-hidden="true"></div>
+        <img id="resultImage" alt="Approved TrueFit try-on result" class="hidden" />
+      </div>
+      <article class="note-pane" aria-labelledby="note-title">
+        <h2 id="note-title">Fit-Physics Note</h2>
+        <div id="noteSkeleton" class="text-skeleton hidden" aria-hidden="true"></div>
+        <div id="fitNote"></div>
+      </article>
+      <div class="button-row full-width">
+        <button id="saveButton" type="button" disabled>Save to Wardrobe</button>
+        <button id="retryButton" class="secondary" type="button">Retry</button>
+        <button id="closeButton" class="secondary" type="button">Close</button>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

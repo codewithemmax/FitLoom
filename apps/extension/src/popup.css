@@ -1,0 +1,58 @@
+:root {
+  --bg: #fffaf4;
+  --ink: #24201d;
+  --muted: #6f6258;
+  --line: #ded2c6;
+  --brand: #6d4c3d;
+  --brand-dark: #4a3329;
+  --danger: #9d2f2f;
+  --ok: #2f6f4e;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  margin: 0;
+  min-width: 390px;
+}
+
+.shell { display: grid; gap: 14px; padding: 16px; }
+h1 { font-size: 24px; line-height: 1; margin: 0 0 8px; }
+h2 { font-size: 17px; margin: 0 0 10px; }
+h3 { font-size: 14px; margin: 12px 0 4px; }
+.lede, .status, dd { color: var(--muted); }
+.eyebrow { color: var(--brand); font-size: 11px; font-weight: 900; letter-spacing: .12em; margin: 0 0 6px; text-transform: uppercase; }
+
+.status { border: 1px solid var(--line); border-radius: 14px; padding: 10px; }
+.status[data-tone="blocked"], .status[data-tone="error"] { border-color: var(--danger); color: var(--danger); }
+.status[data-tone="success"] { border-color: var(--ok); color: var(--ok); }
+
+.controls, .card { display: grid; gap: 10px; }
+.card { background: white; border: 1px solid var(--line); border-radius: 18px; padding: 12px; }
+.hidden { display: none !important; }
+
+label, dt { font-weight: 800; }
+input { border: 1px solid var(--line); border-radius: 12px; font: inherit; padding: 9px 10px; width: 100%; }
+button { background: var(--brand); border: 0; border-radius: 999px; color: white; cursor: pointer; font-weight: 900; padding: 10px 12px; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+button.secondary { background: #ecdfd4; color: var(--brand-dark); }
+button:focus-visible, input:focus-visible { outline: 3px solid #b98565; outline-offset: 2px; }
+.button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.full-width { grid-column: 1 / -1; }
+
+#candidateImage { aspect-ratio: 4 / 5; border-radius: 14px; object-fit: cover; width: 100%; }
+dl { display: grid; gap: 4px; margin: 0; }
+dd { margin: 0 0 8px; }
+
+.result { border-top: 1px solid var(--line); display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding-top: 14px; }
+.visual-pane, .note-pane { min-width: 0; }
+#resultImage, .result-skeleton { aspect-ratio: 4 / 5; border-radius: 16px; object-fit: cover; width: 100%; }
+.result-skeleton, .text-skeleton { background: linear-gradient(90deg, #eadfd3, #fff, #eadfd3); background-size: 220% 100%; animation: shimmer 1.3s infinite; }
+.text-skeleton { border-radius: 12px; height: 180px; }
+#fitNote p, #fitNote ul { margin: 0 0 8px; }
+
+@keyframes shimmer { to { background-position: -220% 0; } }
+@media (max-width: 520px) { body { min-width: 320px; } .result { grid-template-columns: 1fr; } }
