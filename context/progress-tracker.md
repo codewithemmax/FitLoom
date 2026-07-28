@@ -23,29 +23,29 @@ Update this file after every meaningful implementation change.
 
 ## Express Proxy
 
-- [ ] Scaffold TypeScript Express service with health endpoint, typed configuration, and centralized error middleware.
-- [ ] Add Supabase JWT validation middleware for protected routes.
-- [ ] Add consent, file-size, MIME-type, and supported-garment validation.
-- [ ] Configure Multer memory storage; confirm no upload path or disk storage is present.
-- [ ] Implement Google Cloud Vision SafeSearch service for input images.
-- [ ] Add the pre-generation moderation gate with fail-closed responses.
-- [ ] Implement Perfect Corp YouCam submission and bounded asynchronous polling service.
-- [ ] Implement generated-image SafeSearch moderation gate and transient buffer cleanup.
-- [ ] Implement Gemini Fit-Physics Note service using approved garment metadata and user profile fields.
-- [ ] Create a single authenticated generate-try-on endpoint with stable request/response contracts.
-- [ ] Add integration tests for approved, unsafe, malformed, timeout, and vendor-failure paths.
+- [x] Scaffold TypeScript Express service with health endpoint, typed configuration, and centralized error middleware.
+- [x] Add Supabase JWT validation middleware for protected routes.
+- [x] Add consent, file-size, MIME-type, and supported-garment validation.
+- [x] Configure request-scoped memory-only upload handling; confirm no upload path or disk storage is present.
+- [x] Implement Google Cloud Vision SafeSearch service for input images.
+- [x] Add the pre-generation moderation gate with fail-closed responses.
+- [x] Implement Perfect Corp YouCam submission and bounded asynchronous polling service.
+- [x] Implement generated-image SafeSearch moderation gate and transient buffer cleanup.
+- [x] Implement Gemini Fit-Physics Note service using approved garment metadata and user profile fields.
+- [x] Create a single authenticated try-on endpoint with stable request/response contracts.
+- [x] Add integration tests for approved, unsafe, malformed, timeout, and vendor-failure paths.
 
 ## Next.js Web App
 
-- [ ] Scaffold the Next.js TypeScript application and shared styling foundation.
-- [ ] Connect Supabase authentication and protected-route handling.
-- [ ] Build explicit safety consent screen.
-- [ ] Build base-photo guidance and upload experience (front-facing, fully clothed, hair tied back).
-- [ ] Build body-profile form for height, usual size, and fit preferences.
-- [ ] Persist onboarding completion and profile data in Supabase.
-- [ ] Build saved wardrobe gallery with owner-scoped query and result cards.
+- [x] Scaffold the Next.js TypeScript application and shared styling foundation.
+- [x] Connect Supabase authentication and protected-route handling.
+- [x] Build explicit safety consent screen.
+- [x] Build base-photo guidance and upload guidance experience (front-facing, fully clothed, hair tied back).
+- [x] Build body-profile form for height, usual size, and fit preferences.
+- [x] Persist onboarding completion and profile data in Supabase.
+- [x] Build saved wardrobe gallery with owner-scoped query and result cards.
 - [ ] Add saved-item detail view with image, garment data, Fit-Physics Note, and delete/save controls as scoped.
-- [ ] Add friendly empty, loading, error, and blocked states.
+- [x] Add friendly empty, loading, error, and blocked states.
 
 ## Chrome Extension
 
@@ -65,14 +65,18 @@ Update this file after every meaningful implementation change.
 
 - [ ] Confirm the exact Supabase Storage retention and deletion policy for saved wardrobe images.
 - [ ] Confirm the approved image upload size and formats for the chosen YouCam API plan.
-- [ ] Confirm whether Fit-Physics Notes are streamed by the backend or returned once complete for the MVP.
+- [x] Confirm whether Fit-Physics Notes are streamed by the backend or returned once complete for the MVP. Notes are returned once complete for the MVP.
 - [ ] Confirm the extension authentication handoff design for the hackathon demo.
 - [ ] Select and approve a separate minor-protection control if the product must enforce “no minors processed”; Google Cloud Vision SafeSearch alone does not provide age/minor detection.
 
 ## Architecture Decisions
 
-- [ ] No implementation decisions recorded yet.
+- [x] Unit 01 backend foundation implemented with versioned `/api/v1` protected routes, Supabase-token-derived request identity, Zod request/response contracts, and a consistent JSON envelope.
 
 ## Session Notes
 
 - [ ] Initial Six-File Context Methodology files created; all build tasks remain To Do.
+- [x] Unit 01 verified with typecheck, lint, and unit tests.
+- [x] Unit 02 safety pipeline implemented with pre/post SafeSearch gates, bounded YouCam polling, safe error envelopes, and request-scoped media cleanup tests.
+- [x] Unit 03 implemented with typed Gemini fit-note generation, session-scoped approved results, explicit owner-scoped save, and cleanup-on-failed-save tests.
+- [x] Unit 04 implemented with Next.js auth screens, protected onboarding, Supabase-backed consent/profile actions, and an owner-scoped wardrobe gallery.
