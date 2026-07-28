@@ -26,8 +26,8 @@ At the point of discovery, TrueFit provides a safe virtual visualization and a p
 3. While browsing a web page, the user opens the TrueFit Chrome extension.
 4. The extension detects a primary garment image and scrapes available garment metadata such as composition and sizing information.
 5. The user confirms the garment thumbnail before generation.
-6. The extension sends the approved request to the Express proxy.
-7. The proxy moderates inputs, orchestrates the YouCam generation, moderates the result, and requests the Fit-Physics Note.
+6. y.
+7. The pThe extension sends the approved request to the Express proxroxy moderates inputs, orchestrates the YouCam generation, moderates the result, and requests the Fit-Physics Note.
 8. The extension shows the visual result and note in its split-screen result view.
 9. The user either saves the result to their wardrobe or closes the panel, clearing session-only media from memory.
 
