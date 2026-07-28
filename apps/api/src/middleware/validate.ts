@@ -1,5 +1,5 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
-import type { ZodType } from 'zod';
+import type { ZodType, ZodTypeDef } from 'zod';
 
 import { AppError } from '../errors/app-error.js';
 
@@ -29,7 +29,7 @@ export const validateQuery = <T>(schema: ZodType<T>): RequestHandler =>
     next();
   };
 
-export const validateVendorResponse = <T>(schema: ZodType<T>, value: unknown): T => {
+export const validateVendorResponse = <T>(schema: ZodType<T, ZodTypeDef, unknown>, value: unknown): T => {
   const result = schema.safeParse(value);
 
   if (!result.success) {

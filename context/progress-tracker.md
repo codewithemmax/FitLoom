@@ -25,15 +25,15 @@ Update this file after every meaningful implementation change.
 
 - [x] Scaffold TypeScript Express service with health endpoint, typed configuration, and centralized error middleware.
 - [x] Add Supabase JWT validation middleware for protected routes.
-- [ ] Add consent, file-size, MIME-type, and supported-garment validation.
-- [ ] Configure Multer memory storage; confirm no upload path or disk storage is present.
-- [ ] Implement Google Cloud Vision SafeSearch service for input images.
-- [ ] Add the pre-generation moderation gate with fail-closed responses.
-- [ ] Implement Perfect Corp YouCam submission and bounded asynchronous polling service.
-- [ ] Implement generated-image SafeSearch moderation gate and transient buffer cleanup.
+- [x] Add consent, file-size, MIME-type, and supported-garment validation.
+- [x] Configure request-scoped memory-only upload handling; confirm no upload path or disk storage is present.
+- [x] Implement Google Cloud Vision SafeSearch service for input images.
+- [x] Add the pre-generation moderation gate with fail-closed responses.
+- [x] Implement Perfect Corp YouCam submission and bounded asynchronous polling service.
+- [x] Implement generated-image SafeSearch moderation gate and transient buffer cleanup.
 - [ ] Implement Gemini Fit-Physics Note service using approved garment metadata and user profile fields.
-- [ ] Create a single authenticated generate-try-on endpoint with stable request/response contracts.
-- [ ] Add integration tests for approved, unsafe, malformed, timeout, and vendor-failure paths.
+- [x] Create a single authenticated try-on endpoint with stable request/response contracts.
+- [x] Add integration tests for approved, unsafe, malformed, timeout, and vendor-failure paths.
 
 ## Next.js Web App
 
@@ -77,3 +77,4 @@ Update this file after every meaningful implementation change.
 
 - [ ] Initial Six-File Context Methodology files created; all build tasks remain To Do.
 - [x] Unit 01 verified with typecheck, lint, and unit tests.
+- [x] Unit 02 safety pipeline implemented with pre/post SafeSearch gates, bounded YouCam polling, safe error envelopes, and request-scoped media cleanup tests.
