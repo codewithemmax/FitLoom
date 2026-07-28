@@ -37,15 +37,15 @@ Update this file after every meaningful implementation change.
 
 ## Next.js Web App
 
-- [ ] Scaffold the Next.js TypeScript application and shared styling foundation.
-- [ ] Connect Supabase authentication and protected-route handling.
-- [ ] Build explicit safety consent screen.
-- [ ] Build base-photo guidance and upload experience (front-facing, fully clothed, hair tied back).
-- [ ] Build body-profile form for height, usual size, and fit preferences.
-- [ ] Persist onboarding completion and profile data in Supabase.
-- [ ] Build saved wardrobe gallery with owner-scoped query and result cards.
+- [x] Scaffold the Next.js TypeScript application and shared styling foundation.
+- [x] Connect Supabase authentication and protected-route handling.
+- [x] Build explicit safety consent screen.
+- [x] Build base-photo guidance and upload guidance experience (front-facing, fully clothed, hair tied back).
+- [x] Build body-profile form for height, usual size, and fit preferences.
+- [x] Persist onboarding completion and profile data in Supabase.
+- [x] Build saved wardrobe gallery with owner-scoped query and result cards.
 - [ ] Add saved-item detail view with image, garment data, Fit-Physics Note, and delete/save controls as scoped.
-- [ ] Add friendly empty, loading, error, and blocked states.
+- [x] Add friendly empty, loading, error, and blocked states.
 
 ## Chrome Extension
 
@@ -79,3 +79,4 @@ Update this file after every meaningful implementation change.
 - [x] Unit 01 verified with typecheck, lint, and unit tests.
 - [x] Unit 02 safety pipeline implemented with pre/post SafeSearch gates, bounded YouCam polling, safe error envelopes, and request-scoped media cleanup tests.
 - [x] Unit 03 implemented with typed Gemini fit-note generation, session-scoped approved results, explicit owner-scoped save, and cleanup-on-failed-save tests.
+- [x] Unit 04 implemented with Next.js auth screens, protected onboarding, Supabase-backed consent/profile actions, and an owner-scoped wardrobe gallery.
