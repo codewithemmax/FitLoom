@@ -1,7 +1,7 @@
 'use client';
 
 const WardrobeError = ({ reset }: { reset: () => void }): React.ReactElement => (
-  <section className="panel narrow" role="alert">
+  <section className="panel narrow state-panel" role="alert">
     <p className="eyebrow">Something went wrong</p>
     <h1>We could not load your wardrobe</h1>
     <p>Please try again. Your saved items remain private to your account.</p>

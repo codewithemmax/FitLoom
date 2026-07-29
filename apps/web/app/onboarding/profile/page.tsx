@@ -18,7 +18,7 @@ const ProfilePage = async (): Promise<React.ReactElement> => {
   }
 
   return (
-    <section className="panel narrow" aria-labelledby="profile-title">
+    <section className="panel narrow profile-panel" aria-labelledby="profile-title">
       <p className="eyebrow">Step 2 of 2</p>
       <h1 id="profile-title">Fit profile</h1>
       <p className="lede">These details help the backend generate a Fit-Physics Note from garment metadata. They are not a sizing guarantee.</p>
