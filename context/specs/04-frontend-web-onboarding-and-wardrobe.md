@@ -2,13 +2,13 @@
 
 ## Goal
 
-Build the web experience that signs users in, captures explicit consent and fit profile information, guides a standardized base-photo setup, and displays only the user’s saved wardrobe results.
+Build the web experience that signs users in, captures explicit consent and fit profile information, guides a standardized person-photo setup, and displays only the user’s saved wardrobe results.
 
 ## Design
 
 - Use Next.js and Supabase according to `context/architecture.md`; default to Server Components and use Client Components only where interaction is necessary.
 - The experience should feel calm and trustworthy. Place safety guidance alongside the task that requires it.
-- Do not persist raw base-photo media from the web app unless a reviewed architecture decision changes the current transient-media rule.
+- Do not persist raw person-photo media from the web app unless a reviewed architecture decision changes the current transient-media rule.
 
 ## Implementation
 
@@ -20,8 +20,10 @@ Build the web experience that signs users in, captures explicit consent and fit 
 ### Consent and Profile
 
 - Build an explicit consent screen with a required acknowledgement before a try-on can be initiated.
-- Build a body-profile form for height, usual size, and fit preferences.
-- Provide base-photo instructions: front-facing, fully clothed, hair tied back; explain why this improves garment segmentation.
+- Build a fit-profile form for height, usual size, and fit preferences.
+- Build an upload-based try-on form that accepts one user/person photo and multiple product photos.
+- Explain that the person photo must clearly show the user's face and body; random/non-person photos or no-face photos are blocked by backend validation.
+- Provide person-photo instructions: front-facing, fully clothed, hair tied back; explain why this improves garment segmentation.
 - Persist consent and profile data through owner-scoped Supabase operations.
 
 ### Wardrobe

@@ -27,8 +27,8 @@
 - **Supabase Auth**: User identity and sessions.
 - **Supabase Postgres**: Profile data (height, usual size, fit preferences), consent record, garment metadata for saved items, Fit-Physics Notes, and saved-result metadata.
 - **Supabase Storage**: Final composited image only after the user explicitly selects “Save to Wardrobe.” Access must be scoped to the owning user.
-- **Process memory**: Base photos, garment-source images, vendor payload buffers, and any unsaved generated image. Use Multer memory storage only; release references after the request completes.
-- **Never persist**: Raw base photos, blocked images, failed generation artifacts, or unsaved source media.
+- **Process memory**: Person photos, garment-source images, vendor payload buffers, and any unsaved generated image. Use Multer memory storage only; release references after the request completes.
+- **Never persist**: Raw person photos, blocked images, failed generation artifacts, or unsaved source media.
 
 ## Auth and Access Model
 
@@ -46,10 +46,10 @@
 
 ## Safety-First Data Flow
 
-1. The extension collects a candidate garment image and textual metadata, then displays a thumbnail confirmation.
-2. After user confirmation, the extension sends the base photo, garment image, and metadata to the authenticated Express endpoint.
+1. The web app accepts a person photo plus one or more product photos; the extension can also collect a candidate garment image and textual metadata, then display a thumbnail confirmation.
+2. After user confirmation, the client sends the person photo, product image(s), and metadata to the authenticated Express endpoint.
 3. Express validates type, size, garment scope, consent, and required inputs; uploaded buffers stay in RAM.
-4. Google Cloud Vision SafeSearch moderates the base photo and garment image. Any unsafe, ambiguous, missing, or failed moderation result stops the request.
+4. Google Cloud Vision checks that the person photo has a detectable face, then SafeSearch moderates the person photo and every product image. Any unsafe, ambiguous, missing, or failed moderation result stops the request.
 5. Only approved inputs are submitted to YouCam. Express owns YouCam’s asynchronous polling and does not expose its credentials or task lifecycle to clients.
 6. The generated image is sent through SafeSearch again. A blocked, ambiguous, or failed check returns a safe error and the image is discarded.
 7. For approved output, Gemini receives only the approved garment metadata and relevant profile fields to produce the Fit-Physics Note.

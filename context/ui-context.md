@@ -2,7 +2,7 @@
 
 ## Product Movement
 
-1. **Onboarding** — A signed-in user reviews explicit photo-use consent, sees base-photo guidance, uploads a front-facing fully clothed image with hair tied back, and enters sizing preferences.
+1. **Onboarding** — A signed-in user reviews explicit photo-use consent, sees person-photo guidance, uploads a front-facing fully clothed image with hair tied back, and enters sizing preferences.
 2. **Discovery** — On a retailer, social, or editorial page, the user opens the extension. It finds the candidate garment image and available text metadata.
 3. **Thumbnail confirmation** — The extension shows the detected garment thumbnail and metadata summary. The user must confirm that it is the intended supported garment before continuing.
 4. **Try-On trigger** — The user selects “Generate Fit.” The UI starts the secure processing state and makes clear that results are an assessment, not a guarantee.
