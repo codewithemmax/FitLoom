@@ -1,5 +1,5 @@
 const WardrobeLoading = (): React.ReactElement => (
-  <section className="panel loading-panel" aria-busy="true" aria-live="polite">
+  <section className="panel" aria-busy="true" aria-live="polite">
     <p className="eyebrow">Loading</p>
     <h1>Opening your wardrobe…</h1>
     <div className="gallery" aria-hidden="true">

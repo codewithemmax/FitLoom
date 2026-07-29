@@ -14,7 +14,7 @@ TrueFit is a consent-first virtual try-on MVP for online fashion discovery. It p
 ## Safety and data-handling principles
 
 - The backend validates Supabase bearer tokens and derives user identity only from verified auth context.
-- Raw base photos and garment images are request-scoped and in memory only.
+- Raw person photos and garment images are request-scoped and in memory only.
 - Inputs are moderated before YouCam; generated outputs are moderated before display or save.
 - Gemini receives approved garment metadata and minimal profile fields only; it does not receive raw image buffers.
 - Try-on generation returns a session-scoped result. Supabase Storage/database persistence happens only after an explicit save action.
@@ -204,7 +204,8 @@ Test flow:
 2. Sign up or sign in.
 3. Complete consent at `/onboarding`.
 4. Complete fit profile at `/onboarding/profile`.
-5. Confirm `/wardrobe` shows an empty state or your saved results.
+5. Open `/try-on`, upload one clear person photo and one or more product photos, and generate a moderated try-on.
+6. Confirm `/wardrobe` shows an empty state or your saved results.
 
 ### Chrome extension
 
@@ -217,7 +218,7 @@ Test flow:
 7. Open a supported product page for a top or outerwear item.
 8. Open the TrueFit extension popup.
 9. Paste a Supabase access token for your signed-in test user.
-10. Select a front-facing, fully clothed base photo.
+10. Select a front-facing, fully clothed person photo.
 11. Click **Detect garment**.
 12. Confirm the detected thumbnail.
 13. Click **Generate Fit**.
@@ -262,7 +263,7 @@ cd apps/api && npm run typecheck && npm test
 ## Current limitations
 
 - The extension auth handoff is manual token paste for the MVP.
-- The web app has onboarding and wardrobe gallery screens, but no saved-item detail page yet.
+- The web app has onboarding, upload-based try-on, and wardrobe gallery screens, but no saved-item detail page yet.
 - The backend currently uses in-memory current-result storage for session-scoped unsaved results; production deployment may require a reviewed short-lived result cache strategy.
 - Minor detection is not implemented. Google Vision SafeSearch is not a minor/age detector.
 - Live end-to-end testing requires real Supabase, Google Vision, Gemini, and YouCam credentials.

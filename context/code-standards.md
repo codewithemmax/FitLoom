@@ -28,7 +28,7 @@
 - Separate content-script extraction from popup/panel rendering and API communication.
 - Treat scraped DOM content as untrusted. Sanitize, validate, and constrain it before displaying or sending it.
 - Require an explicit thumbnail confirmation after extraction and before every generation request.
-- Do not store raw base photos, source images, bearer tokens, or generation results in persistent extension storage unless a future, reviewed requirement explicitly permits it.
+- Do not store raw person photos, source images, bearer tokens, or generation results in persistent extension storage unless a future, reviewed requirement explicitly permits it.
 - Support only the documented MVP garment categories; reject unclear product classification rather than guessing.
 
 ## Express Backend

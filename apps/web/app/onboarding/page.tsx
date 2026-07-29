@@ -18,19 +18,19 @@ const OnboardingPage = async (): Promise<React.ReactElement> => {
   }
 
   return (
-    <section className="panel onboarding-panel" aria-labelledby="consent-title">
-      <p className="eyebrow">Start a try-on</p>
-      <h1 id="consent-title">See it on you.</h1>
-      <p className="lede">Upload one clear photo of yourself and one or more photos of the product. TrueFit creates a visual preview so you can decide whether the piece is worth trying.</p>
+    <section className="panel" aria-labelledby="consent-title">
+      <p className="eyebrow">Step 1 of 2</p>
+      <h1 id="consent-title">Consent and photo safety</h1>
+      <p className="lede">TrueFit processes try-on photos transiently. Saved wardrobe items are stored only when you explicitly choose to save a result.</p>
       <div className="guidance-grid">
         <article>
-          <h2>Your photo</h2>
+          <h2>Base-photo setup</h2>
           <ul>
             <li>Stand front-facing in even lighting.</li>
-            <li>Show one person clearly with the face visible.</li>
-            <li>Use a well-lit, front-facing photo.</li>
+            <li>Stay fully clothed.</li>
+            <li>Tie hair back when possible.</li>
           </ul>
-          <p>We check for a detectable face and reject random or unreadable images before generation.</p>
+          <p>These steps improve garment segmentation and reduce ambiguous moderation or try-on results.</p>
         </article>
         <ConsentForm />
       </div>

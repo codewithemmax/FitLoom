@@ -17,6 +17,12 @@ Use these official references as the source of truth before adding, changing, tr
 - **Required documentation checks**: supported model and SDK version, current authentication method, structured-output options, streaming behavior, safety settings, quota/rate limits, and response schema.
 - **Integration rule**: Use a server-side API key only. Validate the response against the typed Fit-Physics Note contract and preserve the UI disclaimer that this is guidance—not a physical-fit or size guarantee.
 
+## Google Cloud Vision API: Face Detection
+
+- **Role in TrueFit**: The person-photo validity gate. The Express proxy checks that the user-uploaded person photo includes a detectable face before any try-on vendor request. No face, low confidence, malformed response, or failed request blocks generation.
+- **Official documentation**: [Detect faces](https://cloud.google.com/vision/docs/detecting-faces)
+- **Integration rule**: Use face presence as a safety/input-quality gate only. Do not claim identity verification, age detection, or minor detection.
+
 ## Google Cloud Vision API: SafeSearch
 
 - **Role in TrueFit**: The structural image-safety gate. The Express proxy uses SafeSearch on each input image before YouCam and on the generated image before it is returned or saved.

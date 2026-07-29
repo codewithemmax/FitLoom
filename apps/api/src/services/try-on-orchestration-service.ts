@@ -1,13 +1,15 @@
 import { AppError } from '../errors/app-error.js';
 import type { CurrentResultStore } from './current-result-store.js';
 import type { FitNoteService, FitPhysicsNote } from './fit-note-service.js';
+import { createPermissivePersonPhotoValidationService, type PersonPhotoValidationService } from './person-photo-validation-service.js';
 import type { SafeSearchService } from './safe-search-service.js';
 import type { YouCamClient, YouCamTaskResult } from '../vendor/youcam-client.js';
 
 export type TryOnInput = {
   userId: string;
   basePhoto: Buffer;
-  garmentImage: Buffer;
+  garmentImage?: Buffer;
+  garmentImages?: Buffer[];
   garmentCategory: 'top' | 'outerwear';
   metadata: {
     title: string;
@@ -51,21 +53,32 @@ export const createTryOnOrchestrationService = (
   fitNoteService: FitNoteService,
   currentResultStore: CurrentResultStore,
   options: TryOnServiceOptions,
+  personPhotoValidationService: PersonPhotoValidationService = createPermissivePersonPhotoValidationService(),
 ): TryOnOrchestrationService => ({
   async generateTryOn(input: TryOnInput): Promise<TryOnResult> {
     let generatedImage: Buffer | undefined;
+    const garmentImages = [...(input.garmentImages ?? []), ...(input.garmentImage === undefined ? [] : [input.garmentImage])];
 
     try {
-      const baseOutcome = await safeSearchService.moderateImage(input.basePhoto);
-      const garmentOutcome = await safeSearchService.moderateImage(input.garmentImage);
+      if (garmentImages.length === 0) {
+        throw new AppError(400, 'INVALID_REQUEST', 'The request data is invalid.');
+      }
 
-      if (baseOutcome !== 'safe' || garmentOutcome !== 'safe') {
+      const personPhotoValidation = await personPhotoValidationService.validatePersonPhoto(input.basePhoto);
+      if (personPhotoValidation.status !== 'approved') {
+        throw new AppError(422, 'PERSON_PHOTO_INVALID', "The person photo must clearly show the user's face and body for a safe try-on.");
+      }
+
+      const baseOutcome = await safeSearchService.moderateImage(input.basePhoto);
+      const garmentOutcomes = await Promise.all(garmentImages.map((image) => safeSearchService.moderateImage(image)));
+
+      if (baseOutcome !== 'safe' || garmentOutcomes.some((outcome) => outcome !== 'safe')) {
         throw new AppError(422, 'SAFETY_BLOCKED', 'The request could not be approved for try-on generation.');
       }
 
       const task = await youCamClient.createTryOnTask({
         basePhoto: input.basePhoto,
-        garmentImage: input.garmentImage,
+        garmentImage: garmentImages[0] as Buffer,
         garmentCategory: input.garmentCategory,
       });
       const deadline = Date.now() + options.timeoutMs;
@@ -118,7 +131,12 @@ export const createTryOnOrchestrationService = (
       throw new AppError(502, 'TRY_ON_FAILED', 'Try-on generation failed. Please try again later.');
     } finally {
       input.basePhoto = Buffer.alloc(0);
-      input.garmentImage = Buffer.alloc(0);
+      if (input.garmentImage !== undefined) {
+        input.garmentImage = Buffer.alloc(0);
+      }
+      if (input.garmentImages !== undefined) {
+        input.garmentImages = input.garmentImages.map(() => Buffer.alloc(0));
+      }
       generatedImage = undefined;
     }
   },

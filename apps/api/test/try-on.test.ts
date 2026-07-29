@@ -152,4 +152,52 @@ describe('try-on safety orchestration', (): void => {
     expect(youCamClient.createTryOnTask).toHaveBeenCalledTimes(1);
     expect(youCamClient.getTryOnTask).toHaveBeenCalledTimes(1);
   });
+  it('blocks person photos without a clear face before YouCam is called', async (): Promise<void> => {
+    const youCamClient = createSuccessfulYouCamClient();
+    const tryOnService = createTryOnOrchestrationService(
+      createSafeSearch(['safe', 'safe']),
+      youCamClient,
+      createFitNoteService(),
+      createInMemoryCurrentResultStore(),
+      { pollIntervalMs: 0, timeoutMs: 50 },
+      { validatePersonPhoto: async () => ({ status: 'rejected', reason: 'no_face_detected' }) },
+    );
+
+    await expect(
+      tryOnService.generateTryOn({
+        userId: 'verified-user-id',
+        basePhoto: Buffer.from('random-photo'),
+        garmentImages: [Buffer.from('garment')],
+        garmentCategory: 'top',
+        metadata: { title: 'Title', sourceUrl: 'https://example.com/item' },
+      }),
+    ).rejects.toMatchObject({ code: 'PERSON_PHOTO_INVALID' });
+    expect(youCamClient.createTryOnTask).not.toHaveBeenCalled();
+  });
+
+  it('accepts multiple product photos and moderates every product image before generation', async (): Promise<void> => {
+    const safeSearch = createSafeSearch(['safe', 'safe', 'safe', 'safe']);
+    const youCamClient = createSuccessfulYouCamClient();
+    const tryOnService = createTryOnOrchestrationService(
+      safeSearch,
+      youCamClient,
+      createFitNoteService(),
+      createInMemoryCurrentResultStore(),
+      { pollIntervalMs: 0, timeoutMs: 50 },
+      { validatePersonPhoto: async () => ({ status: 'approved' }) },
+    );
+
+    const result = await tryOnService.generateTryOn({
+      userId: 'verified-user-id',
+      basePhoto: Buffer.from('person-photo'),
+      garmentImages: [Buffer.from('front-product'), Buffer.from('back-product')],
+      garmentCategory: 'top',
+      metadata: { title: 'Title', sourceUrl: 'https://example.com/item' },
+    });
+
+    expect(result.resultId).toEqual(expect.any(String));
+    expect(safeSearch.moderateImage).toHaveBeenCalledTimes(4);
+    expect(youCamClient.createTryOnTask).toHaveBeenCalledWith(expect.objectContaining({ garmentImage: Buffer.from('front-product') }));
+  });
+
 });

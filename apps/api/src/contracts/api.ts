@@ -10,6 +10,7 @@ export const errorCodes = [
   'TRY_ON_TIMEOUT',
   'FIT_NOTE_FAILED',
   'SAVE_FAILED',
+  'PERSON_PHOTO_INVALID',
 ] as const;
 
 export type ErrorCode = (typeof errorCodes)[number];

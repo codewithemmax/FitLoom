@@ -3,7 +3,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { AppError } from '../errors/app-error.js';
 
 export type UploadedMemoryFile = {
-  fieldName: 'basePhoto' | 'garmentImage';
+  fieldName: 'basePhoto' | 'garmentImage' | 'garmentImages';
   originalName: string;
   mimeType: 'image/jpeg' | 'image/png' | 'image/webp';
   buffer: Buffer;
@@ -11,7 +11,7 @@ export type UploadedMemoryFile = {
 
 
 const allowedMimeTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
-const allowedFileFields = new Set(['basePhoto', 'garmentImage']);
+const allowedFileFields = new Set(['basePhoto', 'garmentImage', 'garmentImages']);
 
 const parseHeaderParams = (header: string): Record<string, string> => {
   const params: Record<string, string> = {};
@@ -57,6 +57,7 @@ export const createMemoryUploadMiddleware = (options: { fileSizeLimitBytes: numb
       const boundary = `--${boundaryMatch[1]}`;
       const body = await readBody(request, options.totalSizeLimitBytes);
       const files: Partial<Record<UploadedMemoryFile['fieldName'], UploadedMemoryFile>> = {};
+      const fileLists: Partial<Record<UploadedMemoryFile['fieldName'], UploadedMemoryFile[]>> = {};
       const fields: Record<string, string> = {};
 
       for (const rawPart of body.toString('binary').split(boundary)) {
@@ -97,15 +98,21 @@ export const createMemoryUploadMiddleware = (options: { fileSizeLimitBytes: numb
           throw new AppError(400, 'INVALID_REQUEST', 'The request data is invalid.');
         }
 
-        files[fieldName as UploadedMemoryFile['fieldName']] = {
+        const uploadedFile = {
           fieldName: fieldName as UploadedMemoryFile['fieldName'],
           originalName: fileName,
           mimeType: mimeType as UploadedMemoryFile['mimeType'],
           buffer: fileBuffer,
         };
+        files[fieldName as UploadedMemoryFile['fieldName']] = uploadedFile;
+        fileLists[fieldName as UploadedMemoryFile['fieldName']] = [
+          ...(fileLists[fieldName as UploadedMemoryFile['fieldName']] ?? []),
+          uploadedFile,
+        ];
       }
 
       request.uploadedFiles = files;
+      request.uploadedFileLists = fileLists;
       request.uploadedFields = fields;
       next();
     } catch (error: unknown) {

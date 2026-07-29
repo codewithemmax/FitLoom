@@ -7,6 +7,7 @@ declare global {
         userId: string;
       };
       uploadedFiles?: Partial<Record<UploadedMemoryFile['fieldName'], UploadedMemoryFile>>;
+      uploadedFileLists?: Partial<Record<UploadedMemoryFile['fieldName'], UploadedMemoryFile[]>>;
       uploadedFields?: Record<string, string>;
     }
   }

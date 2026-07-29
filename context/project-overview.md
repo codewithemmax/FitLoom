@@ -6,7 +6,7 @@ TrueFit is an in-context virtual try-on platform for online fashion discovery. I
 
 ## Target User
 
-The primary user is an online fashion shopper who discovers a top or outerwear item on a retailer, social, or editorial web page and is uncertain how it will look and fit. The hackathon MVP focuses on people willing to use a standardized, fully clothed base photo and provide basic sizing preferences.
+The primary user is an online fashion shopper who wants to upload a clear photo of themself and one or more product photos to see a moderated generated image of how a supported garment may look on them. The hackathon MVP focuses on people willing to use a standardized, fully clothed person photo with their face visible, plus basic sizing preferences for fit guidance.
 
 ## Core Value Proposition
 
@@ -14,30 +14,28 @@ At the point of discovery, TrueFit provides a safe virtual visualization and a p
 
 ## Goals
 
-1. Let a signed-in user try on a detected top or outerwear garment from the current web page.
+1. Let a signed-in user try on a top or outerwear garment by uploading a clear person photo and one or more product photos, or by confirming a detected garment in the extension.
 2. Pair every generated image with a Gemini-generated Fit-Physics Note based on garment metadata and the user profile.
 3. Enforce a safety-first, fail-closed moderation pipeline for every user and generated image.
 4. Allow the user to save only explicitly chosen results to a personal wardrobe gallery.
 
 ## Core User Flow
 
-1. The user signs in through the web app, accepts the photo-use consent, and creates a body profile.
-2. The user uploads a standardized front-facing, fully clothed base photo with hair tied back.
-3. While browsing a web page, the user opens the TrueFit Chrome extension.
-4. The extension detects a primary garment image and scrapes available garment metadata such as composition and sizing information.
-5. The user confirms the garment thumbnail before generation.
-6. y.
-7. The pThe extension sends the approved request to the Express proxroxy moderates inputs, orchestrates the YouCam generation, moderates the result, and requests the Fit-Physics Note.
-8. The extension shows the visual result and note in its split-screen result view.
-9. The user either saves the result to their wardrobe or closes the panel, clearing session-only media from memory.
+1. The user signs in through the web app, accepts the photo-use consent, and creates a fit profile.
+2. The user uploads one clear, front-facing, fully clothed person photo with their face visible.
+3. The user uploads one or more product photos for a supported top or outerwear item.
+4. The backend rejects random/non-person photos, photos without a detectable face, unsafe images, unsupported categories, and ambiguous moderation outcomes before generation.
+5. The Express proxy moderates approved inputs, orchestrates YouCam generation, moderates the generated result, and requests the Fit-Physics Note.
+6. The web app or extension shows the approved generated image plus Fit-Physics Note.
+7. The user either saves the result to their wardrobe or closes the flow, clearing session-only media from memory.
 
 ## Core Features
 
-### In-Context Discovery
+### Photo-Based Try-On
 
-- Chrome extension capture from the page where the garment is discovered.
-- Garment-image and metadata extraction.
-- Mandatory thumbnail confirmation before a try-on request.
+- Web upload flow with one person photo and one or more product photos.
+- Person-photo checks that require a visible face and reject random/non-person inputs before generation.
+- Chrome extension capture remains available for page-local garment discovery and mandatory thumbnail confirmation.
 
 ### Fit-Physics Note
 
@@ -46,7 +44,7 @@ At the point of discovery, TrueFit provides a safe virtual visualization and a p
 
 ### Safety-by-Design
 
-- Explicit user consent and standardized base-photo guidance.
+- Explicit user consent and standardized person-photo guidance: front-facing, fully clothed, face visible, and hair tied back where possible.
 - Google Cloud Vision SafeSearch checks before and after generation.
 - Memory-only handling for transient uploaded photos.
 - A fail-closed backend: unsafe, ambiguous, or unavailable moderation outcomes do not reach generation or display.
@@ -54,7 +52,7 @@ At the point of discovery, TrueFit provides a safe virtual visualization and a p
 ## MVP Scope
 
 - Tops and outerwear only: jackets, T-shirts, and button-downs.
-- Next.js onboarding, authentication, profile setup, and saved wardrobe gallery.
+- Next.js onboarding, authentication, profile setup, upload-based try-on flow, and saved wardrobe gallery.
 - Chrome extension capture, confirmation, generation trigger, and result panel.
 - One secure proxy workflow for moderation, YouCam orchestration, and Gemini fit notes.
 
@@ -68,7 +66,7 @@ At the point of discovery, TrueFit provides a safe virtual visualization and a p
 
 ## Success Criteria
 
-- A signed-in user can complete the onboarding flow and launch a try-on from a supported garment page.
+- A signed-in user can complete onboarding and launch a try-on from the web app by uploading a valid person photo and product images, or from the extension by confirming a supported garment.
 - A request cannot reach YouCam unless input moderation succeeds.
 - An unmoderated or failed post-generation result is never shown or saved.
 - The result view displays a generated image and Fit-Physics Note, with usable loading feedback during API latency.

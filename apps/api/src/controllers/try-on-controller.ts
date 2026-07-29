@@ -17,9 +17,12 @@ export const createTryOnController = (tryOnService: TryOnOrchestrationService): 
     try {
       const metadata = tryOnMetadataSchema.safeParse(request.uploadedFields ?? {});
       const basePhoto = request.uploadedFiles?.basePhoto;
-      const garmentImage = request.uploadedFiles?.garmentImage;
+      const garmentImages = [
+        ...(request.uploadedFileLists?.garmentImages ?? []),
+        ...(request.uploadedFiles?.garmentImage === undefined ? [] : [request.uploadedFiles.garmentImage]),
+      ];
 
-      if (!metadata.success || basePhoto === undefined || garmentImage === undefined) {
+      if (!metadata.success || basePhoto === undefined || garmentImages.length === 0) {
         response.status(400).json(createFailure('INVALID_REQUEST', 'The request data is invalid.'));
         return;
       }
@@ -47,7 +50,7 @@ export const createTryOnController = (tryOnService: TryOnOrchestrationService): 
       const result = await tryOnService.generateTryOn({
         userId,
         basePhoto: basePhoto.buffer,
-        garmentImage: garmentImage.buffer,
+        garmentImages: garmentImages.map((image) => image.buffer),
         garmentCategory: metadata.data.garmentCategory,
         metadata: requestMetadata,
         ...(Object.keys(requestProfile).length === 0 ? {} : { profile: requestProfile }),

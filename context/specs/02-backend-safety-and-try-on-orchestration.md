@@ -16,9 +16,10 @@ Implement the fail-closed Express workflow that validates approved inputs, moder
 ### Media Intake
 
 - Add the authenticated `POST /api/v1/try-ons` route.
-- Require base photo, confirmed garment image, permitted garment category, and the minimum approved metadata contract.
+- Require a person photo, one or more confirmed product/garment images, permitted garment category, and the minimum approved metadata contract.
 - Use Multer `memoryStorage()` with MIME allowlists and explicit byte limits.
 - Reject unsupported categories and incomplete confirmation before any vendor request.
+- Reject no-face, unclear-face, or random/non-person person photos before any try-on vendor request.
 
 ### SafeSearch Gates
 

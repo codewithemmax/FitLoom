@@ -40,8 +40,8 @@ Update this file after every meaningful implementation change.
 - [x] Scaffold the Next.js TypeScript application and shared styling foundation.
 - [x] Connect Supabase authentication and protected-route handling.
 - [x] Build explicit safety consent screen.
-- [x] Build base-photo guidance and upload guidance experience (front-facing, fully clothed, hair tied back).
-- [x] Build body-profile form for height, usual size, and fit preferences.
+- [x] Build person-photo guidance and upload guidance experience (front-facing, fully clothed, hair tied back).
+- [x] Build fit-profile form for height, usual size, and fit preferences.
 - [x] Persist onboarding completion and profile data in Supabase.
 - [x] Build saved wardrobe gallery with owner-scoped query and result cards.
 - [ ] Add saved-item detail view with image, garment data, Fit-Physics Note, and delete/save controls as scoped.
@@ -81,3 +81,4 @@ Update this file after every meaningful implementation change.
 - [x] Unit 03 implemented with typed Gemini fit-note generation, session-scoped approved results, explicit owner-scoped save, and cleanup-on-failed-save tests.
 - [x] Unit 04 implemented with Next.js auth screens, protected onboarding, Supabase-backed consent/profile actions, and an owner-scoped wardrobe gallery.
 - [x] Unit 05 implemented with MV3 garment detection, confirmation-gated generation, session-only API calls, split result UI, save action, and cleanup controls.
+- [x] Product direction corrected to web upload of one clear person photo plus multiple product photos, with backend face-presence validation before generation.

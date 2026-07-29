@@ -102,7 +102,7 @@ const confirmCandidate = () => {
   if (!state.candidate) return;
   state.confirmed = true;
   elements.generateButton.disabled = false;
-  setStatus('Garment confirmed. Add a base photo and generate when ready.');
+  setStatus('Garment confirmed. Add a person photo and generate when ready.');
 };
 
 const renderFitNote = (note) => {
@@ -142,7 +142,7 @@ const generateFit = async () => {
   state.basePhoto = elements.basePhoto.files?.[0] ?? null;
 
   if (!state.token || !state.basePhoto || !state.candidate || !state.confirmed) {
-    setStatus('Confirm a supported garment, paste a session token, and choose a base photo first.', 'blocked');
+    setStatus('Confirm a supported garment, paste a session token, and choose a person photo first.', 'blocked');
     return;
   }
 
@@ -162,7 +162,7 @@ const generateFit = async () => {
     elements.resultImage.removeAttribute('src');
     elements.fitNote.replaceChildren();
     setMode(error?.code === 'SAFETY_BLOCKED' ? 'blocked' : 'error');
-    setStatus(error?.message || 'Try-on failed. You can retry after checking the detected garment and base photo.', error?.code === 'SAFETY_BLOCKED' ? 'blocked' : 'error');
+    setStatus(error?.message || 'Try-on failed. You can retry after checking the detected garment and person photo.', error?.code === 'SAFETY_BLOCKED' ? 'blocked' : 'error');
   } finally {
     state.basePhoto = null;
   }
