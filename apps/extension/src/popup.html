@@ -8,24 +8,27 @@
 </head>
 <body>
   <main class="shell">
-    <header>
-      <p class="eyebrow">TrueFit extension</p>
-      <h1>Confirm a garment try-on</h1>
-      <p class="lede">Detected page content is treated as untrusted and must be confirmed before generation.</p>
+    <header class="brand-header">
+      <div class="brand-lockup"><span class="brand-mark" aria-hidden="true">TF</span><span>TrueFit</span></div>
+      <p class="eyebrow">Virtual fitting room</p>
+      <h1>See the look on you.</h1>
+      <p class="lede">Bring any product page into your wardrobe and preview how it could look on your own body.</p>
     </header>
 
-    <section class="status" id="status" role="status" aria-live="polite">Ready to scan this page.</section>
+    <section class="status" id="status" role="status" aria-live="polite">Ready to capture this product page.</section>
 
     <section class="controls" aria-label="Session setup">
-      <label for="apiToken">Supabase access token (session only)</label>
+      <div class="section-heading"><span class="step">01</span><div><h2>Make it yours</h2><p>Use a clear photo of yourself. Your face should be visible.</p></div></div>
+      <label for="apiToken">Session access token</label>
       <input id="apiToken" type="password" autocomplete="off" placeholder="Paste access token" />
-      <label for="basePhoto">Base photo (front-facing, fully clothed, hair tied back)</label>
+      <label for="basePhoto">Your photo</label>
       <input id="basePhoto" type="file" accept="image/png,image/jpeg,image/webp" />
-      <button id="detectButton" type="button">Detect garment</button>
+      <p id="photoHint" class="field-hint">Front-facing, fully clothed, with enough of your outfit visible.</p>
+      <button id="detectButton" type="button">Capture product from this page</button>
     </section>
 
     <section id="confirmPanel" class="card hidden" aria-labelledby="confirm-title">
-      <h2 id="confirm-title">Confirm detected item</h2>
+      <div class="section-heading"><span class="step">02</span><div><h2 id="confirm-title">Review the product</h2><p>Check the item before it becomes part of your look.</p></div></div>
       <img id="candidateImage" alt="Detected garment thumbnail" />
       <dl>
         <dt>Title</dt><dd id="candidateTitle"></dd>
@@ -33,25 +36,27 @@
         <dt>Material details</dt><dd id="candidateMetadata"></dd>
       </dl>
       <div class="button-row">
-        <button id="confirmButton" type="button">Confirm garment</button>
+        <button id="confirmButton" type="button">Confirm product</button>
         <button id="cancelButton" class="secondary" type="button">Cancel</button>
       </div>
-      <button id="generateButton" type="button" disabled>Generate Fit</button>
+      <button id="generateButton" type="button" disabled>Preview this look</button>
     </section>
 
     <section id="resultPanel" class="result hidden" aria-labelledby="result-title">
       <div class="visual-pane">
-        <h2 id="result-title">Approved visual result</h2>
+        <p class="eyebrow">Your fitting room</p>
+        <h2 id="result-title">Your look, visualized</h2>
         <div id="visualSkeleton" class="result-skeleton hidden" aria-hidden="true"></div>
         <img id="resultImage" alt="Approved TrueFit try-on result" class="hidden" />
       </div>
       <article class="note-pane" aria-labelledby="note-title">
-        <h2 id="note-title">Fit-Physics Note</h2>
+        <h2 id="note-title">AI wardrobe review</h2>
         <div id="noteSkeleton" class="text-skeleton hidden" aria-hidden="true"></div>
         <div id="fitNote"></div>
       </article>
       <div class="button-row full-width">
-        <button id="saveButton" type="button" disabled>Save to Wardrobe</button>
+        <button id="saveButton" type="button" disabled>Save to wardrobe</button>
+        <button id="communityButton" class="secondary" type="button">Open community</button>
         <button id="retryButton" class="secondary" type="button">Retry</button>
         <button id="closeButton" class="secondary" type="button">Close</button>
       </div>

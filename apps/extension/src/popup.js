@@ -1,4 +1,5 @@
 import { requestTryOn, saveToWardrobe } from './api-client.js';
+import { TRUEFIT_WEB_APP_URL } from './config.js';
 import { validateCandidate } from './contracts.js';
 
 const state = {
@@ -31,6 +32,8 @@ const elements = {
   saveButton: document.querySelector('#saveButton'),
   retryButton: document.querySelector('#retryButton'),
   closeButton: document.querySelector('#closeButton'),
+  communityButton: document.querySelector('#communityButton'),
+  photoHint: document.querySelector('#photoHint'),
 };
 
 const setStatus = (message, tone = 'neutral') => {
@@ -64,6 +67,28 @@ const clearSessionState = () => {
   setStatus('Session cleared. No media was written to extension storage.');
 };
 
+const validatePersonPhoto = () => {
+  const photo = elements.basePhoto.files?.[0];
+  if (!photo) {
+    elements.photoHint.textContent = 'Front-facing, fully clothed, with enough of your outfit visible.';
+    elements.photoHint.dataset.tone = '';
+    return false;
+  }
+  if (!photo.type.startsWith('image/')) {
+    elements.photoHint.textContent = 'Choose a JPG, PNG, or WebP image.';
+    elements.photoHint.dataset.tone = 'error';
+    return false;
+  }
+  if (photo.size > 12 * 1024 * 1024) {
+    elements.photoHint.textContent = 'Choose an image smaller than 12 MB.';
+    elements.photoHint.dataset.tone = 'error';
+    return false;
+  }
+  elements.photoHint.textContent = 'Photo selected. TrueFit will check that it shows a real person before generation.';
+  elements.photoHint.dataset.tone = 'success';
+  return true;
+};
+
 const activeTab = async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) throw new Error('No active tab is available.');
@@ -72,7 +97,7 @@ const activeTab = async () => {
 
 const detectGarment = async () => {
   setMode('idle');
-  setStatus('Scanning page for a supported top or outerwear item…');
+  setStatus('Scanning this page for a supported product…');
   const tab = await activeTab();
   const response = await chrome.tabs.sendMessage(tab.id, { type: 'TRUEFIT_DETECT_GARMENT' });
   const validation = validateCandidate(response?.candidate);
@@ -95,14 +120,14 @@ const detectGarment = async () => {
   elements.confirmPanel.classList.remove('hidden');
   elements.generateButton.disabled = true;
   setMode('confirming');
-  setStatus('Review the thumbnail and metadata before generating.');
+  setStatus('Review the product details before bringing it into your look.');
 };
 
 const confirmCandidate = () => {
   if (!state.candidate) return;
   state.confirmed = true;
   elements.generateButton.disabled = false;
-  setStatus('Garment confirmed. Add a person photo and generate when ready.');
+  setStatus('Product confirmed. Preview the look when you are ready.');
 };
 
 const renderFitNote = (note) => {
@@ -115,7 +140,7 @@ const renderFitNote = (note) => {
     ['Stretch', note.stretch],
     ['Structure', note.structure],
     ['Uncertainty', note.uncertainty],
-    ['Disclaimer', note.disclaimer],
+    ['Guidance', note.disclaimer],
   ]) {
     const heading = document.createElement('h3');
     heading.textContent = label;
@@ -141,14 +166,14 @@ const generateFit = async () => {
   state.token = elements.apiToken.value.trim();
   state.basePhoto = elements.basePhoto.files?.[0] ?? null;
 
-  if (!state.token || !state.basePhoto || !state.candidate || !state.confirmed) {
+  if (!state.token || !state.basePhoto || !validatePersonPhoto() || !state.candidate || !state.confirmed) {
     setStatus('Confirm a supported garment, paste a session token, and choose a person photo first.', 'blocked');
     return;
   }
 
   elements.resultPanel.classList.remove('hidden');
   setMode('loading');
-  setStatus('Moderating inputs and generating. The result appears only after post-generation moderation passes.');
+  setStatus('Checking your photo and generating the look. This can take a moment.');
 
   try {
     const result = await requestTryOn({ token: state.token, candidate: state.candidate, basePhoto: state.basePhoto });
@@ -156,7 +181,7 @@ const generateFit = async () => {
     elements.resultImage.src = `data:${result.mimeType};base64,${result.imageBase64}`;
     renderFitNote(result.fitPhysicsNote);
     setMode('success');
-    setStatus('Approved result ready. You can save it explicitly or close to clear it.');
+    setStatus('Your look is ready. Save it privately or continue in the TrueFit community.');
   } catch (error) {
     state.result = null;
     elements.resultImage.removeAttribute('src');
@@ -189,3 +214,7 @@ elements.closeButton.addEventListener('click', clearSessionState);
 elements.retryButton.addEventListener('click', () => void detectGarment());
 elements.generateButton.addEventListener('click', () => void generateFit());
 elements.saveButton.addEventListener('click', () => void saveResult());
+elements.basePhoto.addEventListener('change', validatePersonPhoto);
+elements.communityButton.addEventListener('click', () => {
+  void chrome.tabs.create({ url: `${TRUEFIT_WEB_APP_URL}/feed` });
+});
