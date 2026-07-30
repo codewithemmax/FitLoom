@@ -128,6 +128,7 @@ export const createTryOnOrchestrationService = (
         throw error;
       }
 
+      console.error('[TryOn] unexpected error in generateTryOn:', error);
       throw new AppError(502, 'TRY_ON_FAILED', 'Try-on generation failed. Please try again later.');
     } finally {
       input.basePhoto = Buffer.alloc(0);

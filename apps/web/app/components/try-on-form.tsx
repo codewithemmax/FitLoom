@@ -22,7 +22,13 @@ type TryOnResult = {
 
 const apiBaseUrl = process.env.NEXT_PUBLIC_TRUEFIT_API_BASE_URL ?? 'http://localhost:4000';
 
-export const TryOnForm = (): React.ReactElement => {
+type TryOnFormProps = {
+  prefillBasePhoto?: File;
+  prefillGarmentImages?: File[];
+  onBack?: () => void;
+};
+
+export const TryOnForm = ({ prefillBasePhoto, prefillGarmentImages, onBack }: TryOnFormProps = {}): React.ReactElement => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'blocked' | 'error'>('idle');
   const [message, setMessage] = useState('Upload one clear photo of yourself and one or more product photos.');
   const [result, setResult] = useState<TryOnResult | null>(null);
@@ -35,6 +41,13 @@ export const TryOnForm = (): React.ReactElement => {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+
+    if (prefillBasePhoto !== undefined && !formData.has('basePhoto')) {
+      formData.set('basePhoto', prefillBasePhoto, prefillBasePhoto.name);
+    }
+    if (prefillGarmentImages !== undefined && prefillGarmentImages.length > 0 && !formData.has('garmentImages')) {
+      prefillGarmentImages.forEach((f) => formData.append('garmentImages', f, f.name));
+    }
     const supabase = createSupabaseBrowserClient();
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
@@ -70,18 +83,23 @@ export const TryOnForm = (): React.ReactElement => {
 
   return (
     <section className="panel" aria-labelledby="tryon-title">
+      {onBack !== undefined ? <button type="button" className="secondary" style={{ marginBottom: '1.5rem' }} onClick={onBack}>← Back to photos</button> : null}
       <p className="eyebrow">Photo try-on</p>
       <h1 id="tryon-title">Upload yourself and product photos</h1>
       <p className="lede">Use a real front-facing photo that clearly shows your face and body. Random images or photos without a detectable face are blocked before generation.</p>
 
       <form className="form" onSubmit={(event) => void submitTryOn(event)}>
-        <label htmlFor="basePhoto">Your photo</label>
-        <input id="basePhoto" name="basePhoto" type="file" accept="image/png,image/jpeg,image/webp" required />
-        <p className="hint">Front-facing, fully clothed, well lit, and with your face visible.</p>
+        {prefillBasePhoto === undefined ? (
+          <><label htmlFor="basePhoto">Your photo</label>
+          <input id="basePhoto" name="basePhoto" type="file" accept="image/png,image/jpeg,image/webp" required />
+          <p className="hint">Front-facing, fully clothed, well lit, and with your face visible.</p></>
+        ) : <p className="hint">Your photo: <strong>{prefillBasePhoto.name}</strong></p>}
 
-        <label htmlFor="garmentImages">Product photos</label>
-        <input id="garmentImages" name="garmentImages" type="file" accept="image/png,image/jpeg,image/webp" multiple required />
-        <p className="hint">Upload one or more product images. The first approved image is used for generation; all are safety checked.</p>
+        {prefillGarmentImages === undefined || prefillGarmentImages.length === 0 ? (
+          <><label htmlFor="garmentImages">Product photos</label>
+          <input id="garmentImages" name="garmentImages" type="file" accept="image/png,image/jpeg,image/webp" multiple required />
+          <p className="hint">Upload one or more product images. The first approved image is used for generation; all are safety checked.</p></>
+        ) : <p className="hint">Product photos: <strong>{prefillGarmentImages.map((f) => f.name).join(', ')}</strong></p>}
 
         <label htmlFor="garmentCategory">Product category</label>
         <select id="garmentCategory" name="garmentCategory" required>

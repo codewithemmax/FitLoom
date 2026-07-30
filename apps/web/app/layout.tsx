@@ -7,13 +7,24 @@ import './styles.css';
 export const metadata: Metadata = {
   title: 'TrueFit Wardrobe',
   description: 'Consent-first virtual try-on wardrobe.',
+  icons: {
+    icon: '/truefit-logo.png',
+    shortcut: '/truefit-logo.png',
+    apple: '/truefit-logo.png',
+  },
 };
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>): React.ReactElement => (
   <html lang="en">
     <body>
       <header className="site-header">
-        <Link className="brand" href="/wardrobe">TrueFit</Link>
+        <Link className="brand" href="/wardrobe" aria-label="TrueFit wardrobe">
+          <img className="brand-logo" src="/truefit-logo.png" alt="" width="44" height="44" />
+          <span className="brand-copy">
+            <strong>TrueFit</strong>
+            <small>AI try-on wardrobe</small>
+          </span>
+        </Link>
         <nav aria-label="Primary navigation">
           <Link href="/onboarding">Onboarding</Link>
           <Link href="/wardrobe">Wardrobe</Link>

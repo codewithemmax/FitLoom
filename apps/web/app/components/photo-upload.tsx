@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type ChangeEvent, type DragEvent } from 'react';
 
+import { TryOnForm } from './try-on-form';
+
 type PreviewFile = { id: string; file: File; url: string };
 const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const maxFileSize = 5 * 1024 * 1024;
@@ -47,6 +49,12 @@ export const PhotoUpload = (): React.ReactElement => {
     event.target.value = '';
   };
 
+  const [step, setStep] = useState<'intake' | 'review'>('intake');
+
+  if (step === 'review' && personalPhoto !== null && productPhotos.length > 0) {
+    return <TryOnForm prefillBasePhoto={personalPhoto.file} prefillGarmentImages={productPhotos.map((p) => p.file)} onBack={() => setStep('intake')} />;
+  }
+
   return (
     <section className="photo-intake panel" aria-labelledby="photo-intake-title">
       <div className="photo-intake-heading"><div><p className="eyebrow">Photo studio</p><h1 id="photo-intake-title">Bring the look into focus.</h1><p className="lede">Add a photo of yourself and the product you are considering. Your source images stay in this session until you choose what to save.</p></div><span className="photo-step">01 / 02</span></div>
@@ -55,7 +63,7 @@ export const PhotoUpload = (): React.ReactElement => {
         <div className="upload-block"><div className="upload-label"><span>02</span><h2>Product photos</h2><p>{productPhotos.length} / {maxProductPhotos} added · use multiple angles</p></div><label className="dropzone product-dropzone" onDragOver={(event) => event.preventDefault()} onDrop={(event) => onDrop(event, 'product')} htmlFor="product-photos"><input id="product-photos" type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(event) => onChange(event, 'product')} /><strong>Add product photos</strong><span>Front, back, detail, or size label</span><small>Up to {maxProductPhotos} images · max 5 MB each</small></label>{productPhotos.length > 0 ? <div className="photo-strip" aria-label="Selected product photos">{productPhotos.map((photo) => <figure key={photo.id}><img src={photo.url} alt={`Selected product photo ${photo.file.name}`} /><button type="button" aria-label={`Remove ${photo.file.name}`} onClick={() => { URL.revokeObjectURL(photo.url); setProductPhotos((current) => current.filter((item) => item.id !== photo.id)); }}>×</button></figure>)}</div> : null}<p className="upload-note">Multiple images help identify the garment, colour, texture, and construction more reliably.</p></div>
       </div>
       {message ? <p className="upload-message" role="status">{message}</p> : null}
-      <div className="upload-footer"><span>Images are checked before generation.</span><button type="button" disabled={personalPhoto === null || productPhotos.length === 0}>Review photo set <span aria-hidden="true">→</span></button></div>
+      <div className="upload-footer"><span>Images are checked before generation.</span><button type="button" disabled={personalPhoto === null || productPhotos.length === 0} onClick={() => setStep('review')}>Review photo set <span aria-hidden="true">→</span></button></div>
     </section>
   );
 };

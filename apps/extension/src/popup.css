@@ -29,7 +29,7 @@ h3 { font-size: 14px; margin: 12px 0 4px; }
 .eyebrow { color: var(--accent); font-size: 10px; font-weight: 900; letter-spacing: .16em; margin: 0 0 6px; text-transform: uppercase; }
 .brand-header { padding-bottom: 2px; }
 .brand-lockup { align-items: center; display: flex; font-size: 13px; font-weight: 900; gap: 8px; letter-spacing: .06em; text-transform: uppercase; }
-.brand-mark { align-items: center; background: var(--brand); border-radius: 8px; color: #fffdf9; display: inline-flex; font-size: 10px; height: 28px; justify-content: center; letter-spacing: -.08em; width: 28px; }
+.brand-logo { display: block; height: 30px; object-fit: contain; width: 30px; }
 
 .status { background: rgba(255,255,255,.46); border: 1px solid var(--line); border-radius: 12px; padding: 11px 12px; }
 .status[data-tone="blocked"], .status[data-tone="error"] { border-color: var(--danger); color: var(--danger); }

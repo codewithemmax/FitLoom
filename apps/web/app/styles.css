@@ -32,9 +32,10 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 .app-shell { margin: 0 auto; max-width: 1440px; padding: 0 clamp(1rem, 4vw, 4.8rem); }
 .site-header { align-items: center; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; min-height: 88px; }
 .brand { align-items: center; display: inline-flex; gap: 0.7rem; text-decoration: none; }
-.brand-mark { align-items: center; background: var(--ink); color: var(--paper); display: inline-flex; font: 600 0.7rem/1 'DM Mono', monospace; height: 38px; justify-content: center; letter-spacing: -0.08em; width: 38px; }
+.brand-logo { display: block; height: 44px; object-fit: contain; width: 44px; }
+.brand-mark { align-items: center; background: var(--ink); color: var(--paper); display: inline-flex; font: 600 0.7rem/1 'DM Mono', monospace; height: 38px; justify-content: center; width: 38px; }
 .brand-copy { display: grid; gap: 0.18rem; }
-.brand-copy strong { font: 600 1.25rem/1 'Playfair Display', Georgia, serif; letter-spacing: -0.04em; }
+.brand-copy strong { font: 600 1.25rem/1 'Playfair Display', Georgia, serif; letter-spacing: 0; }
 .brand-copy small { color: var(--muted); font: 0.56rem/1 'DM Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
 nav { align-items: center; display: flex; gap: clamp(1rem, 3vw, 2.4rem); }
 .nav-link, .link-button { background: transparent; border: 0; color: var(--muted); font: 600 0.68rem/1 'DM Sans', sans-serif; letter-spacing: 0.08em; min-height: unset; padding: 0; text-decoration: none; text-transform: uppercase; }

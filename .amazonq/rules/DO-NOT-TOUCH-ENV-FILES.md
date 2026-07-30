@@ -1,0 +1,1 @@
+Do not touch the .env file but you can check others like the examples and stuff

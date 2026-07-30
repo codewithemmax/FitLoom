@@ -70,8 +70,10 @@ const buildPrompt = (input: FitNoteInput): string => JSON.stringify({
 export const createGeminiFitNoteService = (options: { apiKey: string; model: string }): FitNoteService => ({
   async createFitNote(input: FitNoteInput): Promise<FitPhysicsNote> {
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(options.model)}:generateContent?key=${encodeURIComponent(options.apiKey)}`,
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(options.model)}:generateContent?key=${encodeURIComponent(options.apiKey)}`;
+      console.debug('[Gemini] createFitNote →', url.replace(/key=[^&]+/, 'key=REDACTED'), { garment: input.garment });
+
+      const response = await fetch(url,
         {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
@@ -83,6 +85,8 @@ export const createGeminiFitNoteService = (options: { apiKey: string; model: str
       );
 
       if (!response.ok) {
+        const errText = await response.text();
+        console.error('[Gemini] HTTP error:', response.status, errText.slice(0, 300));
         throw new AppError(502, 'FIT_NOTE_FAILED', 'Fit guidance could not be generated. Please try again later.');
       }
 
@@ -91,15 +95,20 @@ export const createGeminiFitNoteService = (options: { apiKey: string; model: str
       const text = parsed.candidates[0]?.content.parts[0]?.text;
 
       if (text === undefined) {
+        console.error('[Gemini] no text in response:', JSON.stringify(payload).slice(0, 300));
         throw new AppError(502, 'FIT_NOTE_FAILED', 'Fit guidance could not be generated. Please try again later.');
       }
 
-      return validateVendorResponse(fitPhysicsNoteSchema, JSON.parse(text) as unknown);
+      console.debug('[Gemini] raw response text:', text.slice(0, 300));
+      const note = validateVendorResponse(fitPhysicsNoteSchema, JSON.parse(text) as unknown);
+      console.debug('[Gemini] fit note validated OK');
+      return note;
     } catch (error: unknown) {
       if (error instanceof AppError && error.code === 'FIT_NOTE_FAILED') {
         throw error;
       }
 
+      console.error('[Gemini] unexpected error:', error);
       throw new AppError(502, 'FIT_NOTE_FAILED', 'Fit guidance could not be generated. Please try again later.');
     }
   },

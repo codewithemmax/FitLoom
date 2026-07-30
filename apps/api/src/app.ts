@@ -34,7 +34,23 @@ export const createApp = ({ authService, tryOnService, wardrobeSaveService }: Ap
       },
     );
 
+  const allowedOrigins = new Set(
+    (process.env.ALLOWED_ORIGINS ?? 'http://localhost:3000').split(',').map((o) => o.trim()),
+  );
+
   app.disable('x-powered-by');
+  app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin !== undefined && allowedOrigins.has(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    }
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization,Content-Type');
+    res.setHeader('Access-Control-Max-Age', '86400');
+    if (req.method === 'OPTIONS') { res.sendStatus(204); return; }
+    next();
+  });
   app.use(express.json({ limit: '100kb' }));
   app.use(healthRouter);
   app.use('/api/v1', createUserRouter(authService, resolvedTryOnService, wardrobeSaveService));

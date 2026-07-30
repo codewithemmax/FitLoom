@@ -26,6 +26,7 @@ const visionResponseSchema = z.object({
 
 export const createGoogleVisionSafeSearchService = (apiKey: string): SafeSearchService => ({
   async moderateImage(image: Buffer): Promise<SafeSearchOutcome> {
+    console.debug('[Vision:SafeSearch] moderating image, bytes:', image.length);
     const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${encodeURIComponent(apiKey)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -40,6 +41,8 @@ export const createGoogleVisionSafeSearchService = (apiKey: string): SafeSearchS
     });
 
     if (!response.ok) {
+      const errText = await response.text();
+      console.error('[Vision:SafeSearch] HTTP error:', response.status, errText.slice(0, 300));
       return 'indeterminate';
     }
 
@@ -48,9 +51,12 @@ export const createGoogleVisionSafeSearchService = (apiKey: string): SafeSearchS
     const firstResponse = parsed.responses[0];
 
     if (firstResponse === undefined || firstResponse.error !== undefined) {
+      console.error('[Vision:SafeSearch] response error or missing:', firstResponse?.error);
       return 'indeterminate';
     }
 
-    return classifySafeSearchAnnotation(firstResponse.safeSearchAnnotation);
+    const outcome = classifySafeSearchAnnotation(firstResponse.safeSearchAnnotation);
+    console.debug('[Vision:SafeSearch] outcome:', outcome, firstResponse.safeSearchAnnotation);
+    return outcome;
   },
 });

@@ -26,6 +26,7 @@ const unclearLikelihoods = new Set(['LIKELY', 'VERY_LIKELY']);
 
 export const createGooglePersonPhotoValidationService = (apiKey: string): PersonPhotoValidationService => ({
   async validatePersonPhoto(image: Buffer): Promise<PersonPhotoValidationResult> {
+    console.debug('[Vision:FaceDetection] validating person photo, bytes:', image.length);
     const response = await fetch(`https://vision.googleapis.com/v1/images:annotate?key=${encodeURIComponent(apiKey)}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -40,6 +41,8 @@ export const createGooglePersonPhotoValidationService = (apiKey: string): Person
     });
 
     if (!response.ok) {
+      const errText = await response.text();
+      console.error('[Vision:FaceDetection] HTTP error:', response.status, errText.slice(0, 300));
       return { status: 'rejected', reason: 'unclear_face' };
     }
 
@@ -48,11 +51,13 @@ export const createGooglePersonPhotoValidationService = (apiKey: string): Person
     const firstResponse = parsed.responses[0];
 
     if (firstResponse === undefined || firstResponse.error !== undefined) {
+      console.error('[Vision:FaceDetection] response error or missing:', firstResponse?.error);
       return { status: 'rejected', reason: 'unclear_face' };
     }
 
     const faces = firstResponse.faceAnnotations ?? [];
     if (faces.length === 0) {
+      console.debug('[Vision:FaceDetection] no faces detected');
       return { status: 'rejected', reason: 'no_face_detected' };
     }
 
@@ -62,9 +67,11 @@ export const createGooglePersonPhotoValidationService = (apiKey: string): Person
       unclearLikelihoods.has(primaryFace?.blurredLikelihood ?? '') ||
       unclearLikelihoods.has(primaryFace?.underExposedLikelihood ?? '')
     ) {
+      console.debug('[Vision:FaceDetection] face rejected — confidence:', primaryFace?.detectionConfidence, 'blurred:', primaryFace?.blurredLikelihood, 'underExposed:', primaryFace?.underExposedLikelihood);
       return { status: 'rejected', reason: 'unclear_face' };
     }
 
+    console.debug('[Vision:FaceDetection] approved, confidence:', primaryFace?.detectionConfidence);
     return { status: 'approved' };
   },
 });

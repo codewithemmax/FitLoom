@@ -2,10 +2,8 @@ import { createApp } from './app.js';
 import { loadConfig } from './config/env.js';
 import { createInMemoryCurrentResultStore } from './services/current-result-store.js';
 import { createGeminiFitNoteService, createUnavailableFitNoteService } from './services/fit-note-service.js';
-import { createGoogleVisionSafeSearchService } from './services/google-vision-safe-search-service.js';
-import { createGooglePersonPhotoValidationService } from './services/google-person-photo-validation-service.js';
-import { createUnavailablePersonPhotoValidationService } from './services/person-photo-validation-service.js';
-import { createUnavailableSafeSearchService } from './services/safe-search-service.js';
+import { createNsfwjsSafeSearchService, initNsfwModel } from './services/nsfwjs-safe-search-service.js';
+import { createNsfwjsPersonPhotoValidationService } from './services/nsfwjs-person-photo-validation-service.js';
 import { createSupabaseAuthService } from './services/supabase-auth-service.js';
 import { createTryOnOrchestrationService } from './services/try-on-orchestration-service.js';
 import { createSupabaseWardrobePersistence, createWardrobeSaveService } from './services/wardrobe-save-service.js';
@@ -15,14 +13,11 @@ import { createYouCamHttpClient } from './vendor/youcam-http-client.js';
 const config = loadConfig();
 const authService = createSupabaseAuthService(config);
 const currentResultStore = createInMemoryCurrentResultStore();
-const safeSearchService =
-  config.GOOGLE_CLOUD_VISION_API_KEY === undefined
-    ? createUnavailableSafeSearchService()
-    : createGoogleVisionSafeSearchService(config.GOOGLE_CLOUD_VISION_API_KEY);
-const personPhotoValidationService =
-  config.GOOGLE_CLOUD_VISION_API_KEY === undefined
-    ? createUnavailablePersonPhotoValidationService()
-    : createGooglePersonPhotoValidationService(config.GOOGLE_CLOUD_VISION_API_KEY);
+
+await initNsfwModel();
+
+const safeSearchService = createNsfwjsSafeSearchService();
+const personPhotoValidationService = createNsfwjsPersonPhotoValidationService();
 const youCamClient =
   config.YOUCAM_API_KEY === undefined
     ? createUnavailableYouCamClient()
