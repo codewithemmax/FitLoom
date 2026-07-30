@@ -76,6 +76,7 @@ Update this file after every meaningful implementation change.
 ## Session Notes
 
 - [ ] Initial Six-File Context Methodology files created; all build tasks remain To Do.
+- [x] Community feed and detailed AI Fit-Physics Review surface added with explicit publishing, likes, comments, and owner/published-post RLS migration.
 - [x] Unit 01 verified with typecheck, lint, and unit tests.
 - [x] Unit 02 safety pipeline implemented with pre/post SafeSearch gates, bounded YouCam polling, safe error envelopes, and request-scoped media cleanup tests.
 - [x] Unit 03 implemented with typed Gemini fit-note generation, session-scoped approved results, explicit owner-scoped save, and cleanup-on-failed-save tests.

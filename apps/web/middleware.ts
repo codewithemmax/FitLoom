@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const protectedPrefixes = ['/wardrobe', '/profile', '/onboarding'];
+const protectedPrefixes = ['/wardrobe', '/profile', '/onboarding', '/try-on'];
 
 export const middleware = async (request: NextRequest): Promise<NextResponse> => {
   let response = NextResponse.next({ request });
@@ -42,5 +42,5 @@ export const middleware = async (request: NextRequest): Promise<NextResponse> =>
 };
 
 export const config = {
-  matcher: ['/wardrobe/:path*', '/profile/:path*', '/onboarding/:path*'],
+  matcher: ['/wardrobe/:path*', '/profile/:path*', '/onboarding/:path*', '/try-on/:path*'],
 };

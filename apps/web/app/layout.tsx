@@ -16,8 +16,9 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>): Reac
         <Link className="brand" href="/wardrobe">TrueFit</Link>
         <nav aria-label="Primary navigation">
           <Link href="/onboarding">Onboarding</Link>
-          <Link href="/try-on">Try-on</Link>
           <Link href="/wardrobe">Wardrobe</Link>
+          <Link href="/try-on">Try on</Link>
+          <Link href="/feed">Community</Link>
           <form action={signOut}>
             <button className="link-button" type="submit">Sign out</button>
           </form>

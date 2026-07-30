@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
 import { profileSchema } from '../lib/onboarding';
 import { createSupabaseServerClient } from '../lib/supabase-server';
@@ -111,4 +112,37 @@ export const saveProfile = async (_previousState: ActionState, formData: FormDat
   }
 
   redirect('/wardrobe');
+};
+
+export const publishPost = async (_previousState: ActionState, formData: FormData): Promise<ActionState> => {
+  const user = await requireUser();
+  const savedTryOnId = String(formData.get('savedTryOnId') ?? '');
+  const caption = String(formData.get('caption') ?? '').trim().slice(0, 280);
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from('feed_posts').insert({ user_id: user.id, saved_try_on_id: savedTryOnId, caption });
+  if (error !== null) return { message: 'This result could not be posted. It may already be on the feed.' };
+  revalidatePath('/wardrobe');
+  redirect('/feed');
+};
+
+export const togglePostLike = async (formData: FormData): Promise<void> => {
+  const user = await requireUser();
+  const postId = String(formData.get('postId') ?? '');
+  const supabase = await createSupabaseServerClient();
+  const { data: existing } = await supabase.from('feed_likes').select('post_id').eq('post_id', postId).eq('user_id', user.id).maybeSingle();
+  if (existing === null) await supabase.from('feed_likes').insert({ post_id: postId, user_id: user.id });
+  else await supabase.from('feed_likes').delete().eq('post_id', postId).eq('user_id', user.id);
+  revalidatePath('/feed');
+};
+
+export const addPostComment = async (_previousState: ActionState, formData: FormData): Promise<ActionState> => {
+  const user = await requireUser();
+  const postId = String(formData.get('postId') ?? '');
+  const body = String(formData.get('body') ?? '').trim();
+  if (body.length === 0 || body.length > 500) return { message: 'Comments must be between 1 and 500 characters.' };
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.from('feed_comments').insert({ post_id: postId, user_id: user.id, body });
+  if (error !== null) return { message: 'Your comment could not be posted.' };
+  revalidatePath('/feed');
+  return { message: '' };
 };

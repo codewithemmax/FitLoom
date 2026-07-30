@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { getEnv } from '../../lib/env';
 import { getOnboardingStatus } from '../../lib/onboarding';
 import { createSupabaseServerClient } from '../../lib/supabase-server';
+import { PublishForm } from '../components/publish-form';
 
 type SavedTryOnRow = {
   id: string;
@@ -102,6 +103,7 @@ const WardrobePage = async (): Promise<React.ReactElement> => {
                 <p className="meta">Saved {item.savedDate}</p>
                 <p>{item.notePreview}</p>
                 {item.sourceUrl === null ? null : <a href={item.sourceUrl}>View source garment</a>}
+                <PublishForm savedTryOnId={item.id} />
               </div>
             </li>
           ))}
