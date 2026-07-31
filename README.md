@@ -50,12 +50,13 @@ SUPABASE_RESULTS_BUCKET=try-on-results
 GOOGLE_CLOUD_VISION_API_KEY=your-google-cloud-vision-api-key
 
 YOUCAM_API_KEY=your-youcam-api-key
-YOUCAM_BASE_URL=https://api.yce.perfectcorp.com
+YOUCAM_BASE_URL=https://yce-api-01.perfectcorp.com
 TRY_ON_POLL_INTERVAL_MS=1000
 TRY_ON_TIMEOUT_MS=30000
 
-GEMINI_API_KEY=your-gemini-api-key
-GEMINI_MODEL=gemini-2.0-flash
+GROQ_API_KEY=your-groq-api-key
+GROQ_MODEL=openai/gpt-oss-120b
+GROQ_BASE_URL=https://api.groq.com/openai/v1
 ```
 
 ### Web: `apps/web/.env.local`
@@ -89,72 +90,89 @@ export const TRUEFIT_API_BASE_URL = 'http://localhost:4000';
 
 ### Google Cloud Vision SafeSearch
 
-1. Create or open a Google Cloud project.
-2. Enable billing if required.
-3. Enable the **Cloud Vision API**.
-4. Go to **APIs & Services → Credentials**.
-5. Create an API key and restrict it to Cloud Vision when possible.
-6. Set `GOOGLE_CLOUD_VISION_API_KEY` in `apps/api/.env`.
+---
 
-### Gemini
+#  Project Structure
 
-1. Open Google AI Studio.
-2. Create a Gemini API key for your Google Cloud project.
-3. Set `GEMINI_API_KEY` in `apps/api/.env`.
-4. Keep `GEMINI_MODEL=gemini-2.0-flash` unless you intentionally update and re-test the model contract.
-
-### Perfect Corp / YouCam
-
-1. Sign up for Perfect Corp / YouCam API access.
-2. Create or obtain an API key from the YouCam developer dashboard or account contact.
-3. Set `YOUCAM_API_KEY` in `apps/api/.env`.
-4. Keep `YOUCAM_BASE_URL=https://api.yce.perfectcorp.com` unless your account documentation provides a different endpoint.
-
-## Supabase schema expectations
-
-The current app expects at least these tables and a private Storage bucket.
-
-### Storage
-
-Create a private bucket:
-
-```text
-try-on-results
+```
+truefit/
+│
+├── extension/
+│   ├── popup/
+│   ├── content/
+│   └── background/
+│
+├── web/
+│   ├── app/
+│   ├── components/
+│   ├── pages/
+│   └── lib/
+│
+├── server/
+│   ├── routes/
+│   ├── middleware/
+│   ├── services/
+│   └── controllers/
+│
+├── database/
+│
+├── public/
+│
+└── README.md
 ```
 
-### Tables
+---
 
-The implementation expects these logical fields:
+#  Safety & Privacy
 
-```sql
-profiles:
-  user_id
-  height
-  usual_size
-  fit_preferences
-  onboarding_complete
-  updated_at
+TrueFit was designed with user privacy as a priority.
 
-photo_consents:
-  user_id
-  accepted_at
-  consent_version
+- Images are processed in memory only.
+- Photos are never permanently stored.
+- Users explicitly consent before uploading photos.
+- Google SafeSearch filters unsafe content.
+- AI requests are routed securely through the backend.
 
-saved_try_ons:
-  id
-  user_id
-  result_path
-  garment
-  fit_physics_note
-  source_url
-  created_at
-```
+---
 
-Enable Row Level Security for user-owned tables and apply owner-scoped policies before using real user data.
+#  Edge Cases
 
-## Install and run
+TrueFit gracefully handles situations such as:
 
-### API
+- Unsupported garments
+- Failed image scraping
+- AI generation timeouts
+- NSFW image detection
+- Network failures
+
+Instead of failing silently, users receive clear guidance and fallback experiences.
+
+---
+
+#  Current MVP Scope
+
+Supported:
+
+- T-Shirts
+- Jackets
+- Hoodies
+- Shirts
+- Outerwear
+
+Planned:
+
+- Pants
+- Dresses
+- Skirts
+- Shoes
+- Accessories
+- Full-body outfits
+
+---
+
+#  Installation
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/yourusername/truefit.git
