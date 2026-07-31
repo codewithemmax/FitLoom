@@ -5,8 +5,10 @@ import { createUnavailableFitNoteService } from './services/fit-note-service.js'
 import { createGroqFitNoteService } from './services/groq-fit-note-service.js';
 import { createNsfwjsSafeSearchService, initNsfwModel } from './services/nsfwjs-safe-search-service.js';
 import { createNsfwjsPersonPhotoValidationService } from './services/nsfwjs-person-photo-validation-service.js';
+import { createResultDownloadService, createSupabaseSavedResultLoader } from './services/result-download-service.js';
 import { createSupabaseAuthService } from './services/supabase-auth-service.js';
 import { createTryOnOrchestrationService } from './services/try-on-orchestration-service.js';
+import { createWatermarkService } from './services/watermark-service.js';
 import { createSupabaseWardrobePersistence, createWardrobeSaveService } from './services/wardrobe-save-service.js';
 import { createUnavailableYouCamClient } from './vendor/youcam-client.js';
 import { createYouCamHttpClient } from './vendor/youcam-http-client.js';
@@ -39,7 +41,12 @@ const tryOnService = createTryOnOrchestrationService(
   personPhotoValidationService,
 );
 const wardrobeSaveService = createWardrobeSaveService(currentResultStore, createSupabaseWardrobePersistence(config));
-const app = createApp({ authService, tryOnService, wardrobeSaveService });
+const downloadService = createResultDownloadService(
+  currentResultStore,
+  createSupabaseSavedResultLoader(config),
+  createWatermarkService(),
+);
+const app = createApp({ authService, tryOnService, wardrobeSaveService, downloadService });
 
 app.listen(config.PORT, (): void => {
   console.info(`TrueFit API listening on port ${config.PORT}`);

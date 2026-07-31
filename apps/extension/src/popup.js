@@ -79,8 +79,8 @@ const validatePersonPhoto = () => {
     elements.photoHint.dataset.tone = 'error';
     return false;
   }
-  if (photo.size > 12 * 1024 * 1024) {
-    elements.photoHint.textContent = 'Choose an image smaller than 12 MB.';
+  if (photo.size > 10 * 1024 * 1024) {
+    elements.photoHint.textContent = 'Choose an image smaller than 10 MB.';
     elements.photoHint.dataset.tone = 'error';
     return false;
   }
