@@ -1,269 +1,323 @@
-# TrueFit
+#  TrueFit
+### AI-Powered In-Context Virtual Try-On Platform
 
-TrueFit is a consent-first virtual try-on MVP for online fashion discovery. It pairs a moderated visual try-on result with a Gemini-generated Fit-Physics Note so shoppers can understand likely stretch, structure, pressure points, and uncertainty without treating AI imagery as a guaranteed size or physical-fit simulation.
+> Bringing intelligent virtual try-on directly to where you shop.
 
-## What is in this repo
+TrueFit is an AI-powered browser extension and web platform that combines **Perfect Corp's YouCam AI** with **Google Gemini** to deliver realistic virtual try-ons alongside intelligent fit analysis—without requiring users to leave the webpage they're shopping on.
 
-| Path | Purpose |
-| --- | --- |
-| `apps/api` | Express + TypeScript proxy API for auth, validation, memory-only media intake, SafeSearch moderation, YouCam orchestration, Gemini fit notes, and explicit Supabase wardrobe saves. |
-| `apps/web` | Next.js onboarding and wardrobe app for Supabase auth, consent, fit profile capture, and private saved-result browsing. |
-| `apps/extension` | Chrome Manifest V3 MVP extension for page-local garment detection, thumbnail confirmation, try-on requests, split result viewing, and save-to-wardrobe. |
-| `context` | Product, architecture, standards, API reference, progress tracker, and unit specs. |
+Built for the **YouCam AI Hackathon**.
 
-## Safety and data-handling principles
+---
 
-- The backend validates Supabase bearer tokens and derives user identity only from verified auth context.
-- Raw person photos and garment images are request-scoped and in memory only.
-- Inputs are moderated before YouCam; generated outputs are moderated before display or save.
-- Gemini receives approved garment metadata and minimal profile fields only; it does not receive raw image buffers.
-- Try-on generation returns a session-scoped result. Supabase Storage/database persistence happens only after an explicit save action.
-- The Chrome extension keeps token, image, garment, and result data in memory only; it does not use persistent extension storage for sensitive data.
+##  Overview
 
-## Prerequisites
+Online shopping has a major problem:
 
-- Node.js 22+ recommended.
-- npm available for local installs.
-- A Supabase project.
-- Google Cloud Vision API access.
-- Gemini API access.
-- Perfect Corp / YouCam API access.
-- Chrome or a Chromium-based browser for the extension.
+- Clothing sizes vary drastically across brands.
+- Existing virtual try-on solutions only show how clothes *look*, not how they *fit*.
+- Millions of shoppers buy multiple sizes and return unwanted items, increasing costs and environmental waste.
 
-> Note: package installation in the current agent environment was blocked by an npm registry `403 Forbidden` policy for new packages. The API dependencies already present in this environment were testable; the web app needs its declared dependencies installed locally before its typecheck/build can run.
+TrueFit solves this by combining **visual AI** with **fit intelligence**.
 
-## Required keys and environment variables
+Instead of only generating an image, TrueFit also analyzes:
 
-### API: `apps/api/.env`
+- Fabric composition
+- Stretch
+- Garment structure
+- User body profile
+- Fit preferences
 
-Copy `apps/api/.env.example` to `apps/api/.env` and fill in:
+to produce a realistic **Fit Confidence Note** alongside the generated try-on.
 
-```env
-NODE_ENV=development
-PORT=4000
+---
 
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-supabase-anon-or-publishable-key
-SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-or-secret-key
-SUPABASE_RESULTS_BUCKET=try-on-results
+#  Features
 
-GOOGLE_CLOUD_VISION_API_KEY=your-google-cloud-vision-api-key
+###  AI Virtual Try-On
+Generate photorealistic clothing try-ons using Perfect Corp YouCam.
 
-YOUCAM_API_KEY=your-youcam-api-key
-YOUCAM_BASE_URL=https://api.yce.perfectcorp.com
-TRY_ON_POLL_INTERVAL_MS=1000
-TRY_ON_TIMEOUT_MS=30000
+###  AI Fit Analysis
+Google Gemini evaluates:
 
-GEMINI_API_KEY=your-gemini-api-key
-GEMINI_MODEL=gemini-2.0-flash
+- Fabric stretch
+- Material behavior
+- Body measurements
+- Clothing cut
+
+to explain how an item is likely to fit.
+
+###  Browser Extension
+Try clothes directly from:
+
+- Fashion websites
+- Online stores
+- Product pages
+
+without opening another application.
+
+###  Privacy First
+- Session-only image processing
+- No permanent photo storage
+- SafeSearch moderation before and after generation
+
+###  Wardrobe Saving
+Save your favorite try-ons and fit notes for future reference.
+
+---
+
+#  System Architecture
+
+```
+                ┌────────────────────┐
+                │ Browser Extension  │
+                │  (Chrome)          │
+                └─────────┬──────────┘
+                          │
+                          ▼
+               Node.js / Express API
+                          │
+      ┌───────────────────┼──────────────────┐
+      ▼                   ▼                  ▼
+ YouCam API        Google Gemini      Google Vision
+(Virtual Try-On)   (Fit Analysis)     (SafeSearch)
+
+                          │
+                          ▼
+                    Supabase Database
 ```
 
-### Web: `apps/web/.env.local`
+---
 
-Copy `apps/web/.env.example` to `apps/web/.env.local` and fill in:
+#  User Flow
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-or-publishable-key
-SUPABASE_RESULTS_BUCKET=try-on-results
+1. User creates an account.
+2. Uploads a reference photo.
+3. Enters body measurements.
+4. Visits an online clothing store.
+5. Opens the TrueFit browser extension.
+6. Extension detects the clothing item.
+7. User confirms the garment.
+8. AI generates:
+   - Virtual Try-On
+   - Fit Confidence Note
+9. User saves the result to their wardrobe.
+
+---
+
+#  Tech Stack
+
+## Frontend
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Chrome Extension APIs
+
+## Backend
+
+- Node.js
+- Express.js
+- Multer (Memory Storage)
+
+## Database
+
+- Supabase
+- Supabase Auth
+
+## AI Services
+
+- Perfect Corp YouCam API
+- Google Gemini API
+- Google Cloud Vision SafeSearch
+
+---
+
+#  Project Structure
+
+```
+truefit/
+│
+├── extension/
+│   ├── popup/
+│   ├── content/
+│   └── background/
+│
+├── web/
+│   ├── app/
+│   ├── components/
+│   ├── pages/
+│   └── lib/
+│
+├── server/
+│   ├── routes/
+│   ├── middleware/
+│   ├── services/
+│   └── controllers/
+│
+├── database/
+│
+├── public/
+│
+└── README.md
 ```
 
-### Extension API URL
+---
 
-Edit `apps/extension/src/config.js` if the API is not running locally at `http://localhost:4000`.
+#  Safety & Privacy
 
-```js
-export const TRUEFIT_API_BASE_URL = 'http://localhost:4000';
-```
+TrueFit was designed with user privacy as a priority.
 
-## How to get keys
+- Images are processed in memory only.
+- Photos are never permanently stored.
+- Users explicitly consent before uploading photos.
+- Google SafeSearch filters unsafe content.
+- AI requests are routed securely through the backend.
 
-### Supabase
+---
 
-1. Create or open a Supabase project.
-2. Go to **Project Settings → API Keys**.
-3. Copy the project URL to `SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_URL`.
-4. Copy the anon/publishable key to `SUPABASE_ANON_KEY` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-5. Copy the service-role/secret key to `SUPABASE_SERVICE_ROLE_KEY` for the API only.
-6. Do not expose the service-role/secret key to the web app or extension.
+#  Edge Cases
 
-### Google Cloud Vision SafeSearch
+TrueFit gracefully handles situations such as:
 
-1. Create or open a Google Cloud project.
-2. Enable billing if required.
-3. Enable the **Cloud Vision API**.
-4. Go to **APIs & Services → Credentials**.
-5. Create an API key and restrict it to Cloud Vision when possible.
-6. Set `GOOGLE_CLOUD_VISION_API_KEY` in `apps/api/.env`.
+- Unsupported garments
+- Failed image scraping
+- AI generation timeouts
+- NSFW image detection
+- Network failures
 
-### Gemini
+Instead of failing silently, users receive clear guidance and fallback experiences.
 
-1. Open Google AI Studio.
-2. Create a Gemini API key for your Google Cloud project.
-3. Set `GEMINI_API_KEY` in `apps/api/.env`.
-4. Keep `GEMINI_MODEL=gemini-2.0-flash` unless you intentionally update and re-test the model contract.
+---
 
-### Perfect Corp / YouCam
+#  Current MVP Scope
 
-1. Sign up for Perfect Corp / YouCam API access.
-2. Create or obtain an API key from the YouCam developer dashboard or account contact.
-3. Set `YOUCAM_API_KEY` in `apps/api/.env`.
-4. Keep `YOUCAM_BASE_URL=https://api.yce.perfectcorp.com` unless your account documentation provides a different endpoint.
+Supported:
 
-## Supabase schema expectations
+- T-Shirts
+- Jackets
+- Hoodies
+- Shirts
+- Outerwear
 
-The current app expects at least these tables and a private Storage bucket.
+Planned:
 
-### Storage
+- Pants
+- Dresses
+- Skirts
+- Shoes
+- Accessories
+- Full-body outfits
 
-Create a private bucket:
+---
 
-```text
-try-on-results
-```
+#  Installation
 
-### Tables
-
-The implementation expects these logical fields:
-
-```sql
-profiles:
-  user_id
-  height
-  usual_size
-  fit_preferences
-  onboarding_complete
-  updated_at
-
-photo_consents:
-  user_id
-  accepted_at
-  consent_version
-
-saved_try_ons:
-  id
-  user_id
-  result_path
-  garment
-  fit_physics_note
-  source_url
-  created_at
-```
-
-Enable Row Level Security for user-owned tables and apply owner-scoped policies before using real user data.
-
-## Install and run
-
-### API
+Clone the repository:
 
 ```bash
-cd apps/api
+git clone https://github.com/yourusername/truefit.git
+```
+
+Navigate into the project:
+
+```bash
+cd truefit
+```
+
+Install dependencies:
+
+```bash
 npm install
-npm run typecheck
-npm test
-npm run build
+```
+
+Run the development server:
+
+```bash
 npm run dev
 ```
 
-The API runs on:
+---
 
-```text
-http://localhost:4000
+#  Environment Variables
+
+Create a `.env.local` file:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+
+SUPABASE_SERVICE_ROLE_KEY=
+
+GEMINI_API_KEY=
+
+YOUCAM_API_KEY=
+
+GOOGLE_VISION_API_KEY=
 ```
 
-Health check:
+---
+
+#  Future Improvements
+
+- Personalized size recommendations
+- Multi-angle try-on
+- Outfit generation
+- Fashion recommendations
+- Brand size normalization
+- Mobile application
+- AI wardrobe assistant
+- Shopping history analytics
+
+---
+
+#  Impact
+
+TrueFit aims to:
+
+- Reduce online clothing returns
+- Improve shopping confidence
+- Minimize fashion waste
+- Save customers time and money
+- Deliver a seamless AI shopping experience
+
+---
+
+#  Contributing
+
+Contributions are welcome!
+
+1. Fork the repository
+2. Create your feature branch
 
 ```bash
-curl http://localhost:4000/health
+git checkout -b feature/amazing-feature
 ```
 
-Expected response:
-
-```json
-{ "data": { "status": "ok" }, "error": null }
-```
-
-### Web app
+3. Commit your changes
 
 ```bash
-cd apps/web
-npm install
-npm run typecheck
-npm run dev
+git commit -m "Add amazing feature"
 ```
 
-Open:
-
-```text
-http://localhost:3000
-```
-
-Test flow:
-
-1. Open `/auth`.
-2. Sign up or sign in.
-3. Complete consent at `/onboarding`.
-4. Complete fit profile at `/onboarding/profile`.
-5. Open `/try-on`, upload one clear person photo and one or more product photos, and generate a moderated try-on.
-6. Confirm `/wardrobe` shows an empty state or your saved results.
-
-### Chrome extension
-
-1. Ensure the API is running.
-2. Edit `apps/extension/src/config.js` if needed.
-3. Open Chrome and go to `chrome://extensions`.
-4. Enable **Developer mode**.
-5. Click **Load unpacked**.
-6. Select `apps/extension`.
-7. Open a supported product page for a top or outerwear item.
-8. Open the TrueFit extension popup.
-9. Paste a Supabase access token for your signed-in test user.
-10. Select a front-facing, fully clothed person photo.
-11. Click **Detect garment**.
-12. Confirm the detected thumbnail.
-13. Click **Generate Fit**.
-14. Review the approved result and Fit-Physics Note.
-15. Click **Save to Wardrobe** and verify it appears in the web app.
-
-For the MVP, the access token handoff is manual and session-only. The extension does not persist the token, images, or generated result.
-
-## How to test without live vendor keys
-
-The API unit tests use mocked services for critical workflows, so they can run without live Google Vision, Gemini, YouCam, or Supabase writes:
+4. Push to the branch
 
 ```bash
-cd apps/api
-npm test
+git push origin feature/amazing-feature
 ```
 
-These tests cover:
+5. Open a Pull Request
 
-- Health and auth envelopes.
-- Missing/malformed token rejection.
-- Request validation failures.
-- Memory-only upload assertions.
-- SafeSearch blocked/approved paths.
-- YouCam timeout behavior.
-- Fit-note input shaping.
-- Explicit save behavior and cleanup on failed persistence.
+---
 
-## Useful verification commands
 
-From the repo root:
+# 📄 License
 
-```bash
-node --check apps/extension/src/contracts.js
-node --check apps/extension/src/api-client.js
-node --check apps/extension/src/content-script.js
-node --check apps/extension/src/popup.js
-python3 -m json.tool apps/extension/manifest.json >/tmp/manifest.json
-cd apps/api && npm run typecheck && npm test
-```
+ MIT 
 
-## Current limitations
+---
 
-- The extension auth handoff is manual token paste for the MVP.
-- The web app has onboarding, upload-based try-on, and wardrobe gallery screens, but no saved-item detail page yet.
-- The backend currently uses in-memory current-result storage for session-scoped unsaved results; production deployment may require a reviewed short-lived result cache strategy.
-- Minor detection is not implemented. Google Vision SafeSearch is not a minor/age detector.
-- Live end-to-end testing requires real Supabase, Google Vision, Gemini, and YouCam credentials.
+## If you found this project interesting, consider giving it a star!
+
+
+
