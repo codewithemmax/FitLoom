@@ -3,7 +3,7 @@
 
 > Bringing intelligent virtual try-on directly to where you shop.
 
-TrueFit is an AI-powered browser extension and web platform that combines **Perfect Corp's YouCam AI** with **Google Gemini** to deliver realistic virtual try-ons alongside intelligent fit analysis—without requiring users to leave the webpage they're shopping on.
+TrueFit is an AI-powered browser extension and web platform that combines **Perfect Corp's YouCam AI** with **Google Gemini** to deliver realistic virtual try-ons alongside intelligent fit analysis without requiring users to leave the webpage they're shopping on.
 
 Built for the **YouCam AI Hackathon**.
 
@@ -27,7 +27,7 @@ Instead of only generating an image, TrueFit also analyzes:
 - User body profile
 - Fit preferences
 
-to produce a realistic **Fit Confidence Note** alongside the generated try-on.
+to produce a realistic **Fit Confidence Note** alongside the generated try on.
 
 ---
 
