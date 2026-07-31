@@ -50,12 +50,13 @@ SUPABASE_RESULTS_BUCKET=try-on-results
 GOOGLE_CLOUD_VISION_API_KEY=your-google-cloud-vision-api-key
 
 YOUCAM_API_KEY=your-youcam-api-key
-YOUCAM_BASE_URL=https://api.yce.perfectcorp.com
+YOUCAM_BASE_URL=https://yce-api-01.perfectcorp.com
 TRY_ON_POLL_INTERVAL_MS=1000
 TRY_ON_TIMEOUT_MS=30000
 
-GEMINI_API_KEY=your-gemini-api-key
-GEMINI_MODEL=gemini-2.0-flash
+GROQ_API_KEY=your-groq-api-key
+GROQ_MODEL=openai/gpt-oss-120b
+GROQ_BASE_URL=https://api.groq.com/openai/v1
 ```
 
 ### Web: `apps/web/.env.local`
@@ -96,12 +97,11 @@ export const TRUEFIT_API_BASE_URL = 'http://localhost:4000';
 5. Create an API key and restrict it to Cloud Vision when possible.
 6. Set `GOOGLE_CLOUD_VISION_API_KEY` in `apps/api/.env`.
 
-### Gemini
+### Fit notes (Groq)
 
-1. Open Google AI Studio.
-2. Create a Gemini API key for your Google Cloud project.
-3. Set `GEMINI_API_KEY` in `apps/api/.env`.
-4. Keep `GEMINI_MODEL=gemini-2.0-flash` unless you intentionally update and re-test the model contract.
+1. Create an API key at the GroqCloud console (<https://console.groq.com/keys>).
+2. Set `GROQ_API_KEY` in `apps/api/.env`.
+3. Keep `GROQ_MODEL=openai/gpt-oss-120b` unless you intentionally update and re-test the model contract. Fit notes rely on strict `json_schema` structured outputs, which GroqCloud supports only on `openai/gpt-oss-120b` and `openai/gpt-oss-20b`.
 
 ### Perfect Corp / YouCam
 

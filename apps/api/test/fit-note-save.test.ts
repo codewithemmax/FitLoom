@@ -41,7 +41,7 @@ const sendTryOnRequest = (app: ReturnType<typeof createApp>): request.Test =>
     .attach('garmentImage', Buffer.from('garment-image'), { filename: 'garment.png', contentType: 'image/png' });
 
 describe('fit note and explicit save', (): void => {
-  it('calls Gemini fit-note service only with garment metadata and profile fields', async (): Promise<void> => {
+  it('calls the fit-note service only with garment metadata and profile fields', async (): Promise<void> => {
     const capturedInputs: FitNoteInput[] = [];
     const fitNoteService: FitNoteService = {
       createFitNote: vi.fn(async (input: FitNoteInput) => {

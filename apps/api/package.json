@@ -13,9 +13,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",
-    "@tensorflow/tfjs-node": "^4.22.0",
+    "@tensorflow/tfjs": "^4.22.0",
     "express": "^5.1.0",
-    "nsfwjs": "^4.1.0",
+    "jpeg-js": "^0.4.4",
+    "nsfwjs": "^4.3.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

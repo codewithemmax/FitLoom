@@ -1,7 +1,8 @@
 import { createApp } from './app.js';
 import { loadConfig } from './config/env.js';
 import { createInMemoryCurrentResultStore } from './services/current-result-store.js';
-import { createGeminiFitNoteService, createUnavailableFitNoteService } from './services/fit-note-service.js';
+import { createUnavailableFitNoteService } from './services/fit-note-service.js';
+import { createGroqFitNoteService } from './services/groq-fit-note-service.js';
 import { createNsfwjsSafeSearchService, initNsfwModel } from './services/nsfwjs-safe-search-service.js';
 import { createNsfwjsPersonPhotoValidationService } from './services/nsfwjs-person-photo-validation-service.js';
 import { createSupabaseAuthService } from './services/supabase-auth-service.js';
@@ -23,9 +24,9 @@ const youCamClient =
     ? createUnavailableYouCamClient()
     : createYouCamHttpClient({ apiKey: config.YOUCAM_API_KEY, baseUrl: config.YOUCAM_BASE_URL });
 const fitNoteService =
-  config.GEMINI_API_KEY === undefined
+  config.GROQ_API_KEY === undefined
     ? createUnavailableFitNoteService()
-    : createGeminiFitNoteService({ apiKey: config.GEMINI_API_KEY, model: config.GEMINI_MODEL });
+    : createGroqFitNoteService({ apiKey: config.GROQ_API_KEY, model: config.GROQ_MODEL, baseUrl: config.GROQ_BASE_URL });
 const tryOnService = createTryOnOrchestrationService(
   safeSearchService,
   youCamClient,
