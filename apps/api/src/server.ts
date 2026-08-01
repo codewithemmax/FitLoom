@@ -49,5 +49,5 @@ const downloadService = createResultDownloadService(
 const app = createApp({ authService, tryOnService, wardrobeSaveService, downloadService });
 
 app.listen(config.PORT, (): void => {
-  console.info(`TrueFit API listening on port ${config.PORT}`);
+  console.info(`FitLoom API listening on port ${config.PORT}`);
 });

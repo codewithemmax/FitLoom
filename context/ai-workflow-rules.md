@@ -2,7 +2,7 @@
 
 ## Approach
 
-Build TrueFit incrementally and spec-first. Read `context/project-overview.md`, `context/architecture.md`, `context/code-standards.md`, and `context/ui-context.md` before proposing or implementing a feature. Use `context/progress-tracker.md` to select the current task and update it after meaningful work.
+Build FitLoom incrementally and spec-first. Read `context/project-overview.md`, `context/architecture.md`, `context/code-standards.md`, and `context/ui-context.md` before proposing or implementing a feature. Use `context/progress-tracker.md` to select the current task and update it after meaningful work.
 
 Before modifying a Perfect Corp YouCam, Google Gemini, or Google Cloud Vision integration, read the corresponding official link in `context/api-references.md`. Treat that file as the source of truth for current endpoints, versions, limits, and documented limitations.
 

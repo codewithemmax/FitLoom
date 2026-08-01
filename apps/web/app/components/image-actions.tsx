@@ -4,11 +4,11 @@ import { useState } from 'react';
 
 import { createSupabaseBrowserClient } from '../../lib/supabase-browser';
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_TRUEFIT_API_BASE_URL ?? 'http://localhost:4000';
+const apiBaseUrl = process.env.NEXT_PUBLIC_FITLOOM_API_BASE_URL ?? 'http://localhost:4000';
 
 /**
  * Downloads go through the API rather than the storage URL directly: the API is
- * what burns the TrueFit watermark into the image. That also means the request
+ * what burns the FitLoom watermark into the image. That also means the request
  * needs the bearer token, so this cannot be a plain anchor.
  */
 export const DownloadButton = ({ path, filename, label = 'Download' }: { path: string; filename: string; label?: string }): React.ReactElement => {
@@ -64,7 +64,7 @@ export const ShareButton = ({ postId, title }: { postId: string; title: string }
     // Native sheet on mobile, clipboard everywhere else.
     if (typeof navigator.share === 'function') {
       try {
-        await navigator.share({ title, text: `${title} on TrueFit`, url });
+        await navigator.share({ title, text: `${title} on FitLoom`, url });
         return;
       } catch {
         // Dismissing the share sheet is not an error; fall through to copying.

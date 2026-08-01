@@ -1,8 +1,8 @@
-# Project Overview: TrueFit
+# Project Overview: FitLoom
 
 ## Executive Summary
 
-TrueFit is an in-context virtual try-on platform for online fashion discovery. It addresses the fit-physics gap: generative try-on can show how a garment may look, but cannot reliably simulate tension, stretch, drape, or sizing on a particular body. In a market affected by vanity sizing, that uncertainty drives bracketing and returns. TrueFit pairs a visual garment overlay with a grounded, text-based Fit-Physics Note so shoppers can make a more informed decision without leaving the page where they found the item.
+FitLoom is an in-context virtual try-on platform for online fashion discovery. It addresses the fit-physics gap: generative try-on can show how a garment may look, but cannot reliably simulate tension, stretch, drape, or sizing on a particular body. In a market affected by vanity sizing, that uncertainty drives bracketing and returns. FitLoom pairs a visual garment overlay with a grounded, text-based Fit-Physics Note so shoppers can make a more informed decision without leaving the page where they found the item.
 
 ## Target User
 
@@ -10,7 +10,7 @@ The primary user is an online fashion shopper who wants to upload a clear photo 
 
 ## Core Value Proposition
 
-At the point of discovery, TrueFit provides a safe virtual visualization and a practical fit-confidence assessment. It helps shoppers move from “this looks good” to “this may be restrictive across my shoulders because this fabric has little stretch,” without treating AI imagery as a guarantee of physical fit.
+At the point of discovery, FitLoom provides a safe virtual visualization and a practical fit-confidence assessment. It helps shoppers move from “this looks good” to “this may be restrictive across my shoulders because this fabric has little stretch,” without treating AI imagery as a guarantee of physical fit.
 
 ## Goals
 

@@ -4,14 +4,14 @@ Use these official references as the source of truth before adding, changing, tr
 
 ## Perfect Corp YouCam: AI Clothes Virtual Try-On
 
-- **Role in TrueFit**: The visual try-on engine. The Express proxy sends only SafeSearch-approved user and garment images to Perfect Corp, creates the AI Clothes task, polls it to completion, and passes the generated image through SafeSearch before returning it.
+- **Role in FitLoom**: The visual try-on engine. The Express proxy sends only SafeSearch-approved user and garment images to Perfect Corp, creates the AI Clothes task, polls it to completion, and passes the generated image through SafeSearch before returning it.
 - **Official API overview**: [AI Clothes Virtual Try-On](https://docs.perfectcorp.com/reference/ai_clothes/section/overview)
 - **Required documentation checks**: file/image requirements, supported garment categories, upload method, `POST /s2s/v2.0/task/cloth-v3`, task polling, result URL expiry, error codes, rate limits, and current API version.
 - **Integration rule**: Keep the Bearer API key in the Express server only. Do not expose task IDs, vendor error payloads, or keys directly to the web app or Chrome extension.
 
 ## Google Gemini API: Fit-Physics Note
 
-- **Role in TrueFit**: The text-only fit-confidence layer. Gemini receives approved garment metadata (such as material, cut, and available size information) and the minimum profile fields needed for the note. It does not receive raw user or generated image buffers.
+- **Role in FitLoom**: The text-only fit-confidence layer. Gemini receives approved garment metadata (such as material, cut, and available size information) and the minimum profile fields needed for the note. It does not receive raw user or generated image buffers.
 - **Official API reference**: [Gemini API reference](https://ai.google.dev/api)
 - **Content-generation reference**: [Generate content](https://ai.google.dev/api/generate-content)
 - **Required documentation checks**: supported model and SDK version, current authentication method, structured-output options, streaming behavior, safety settings, quota/rate limits, and response schema.
@@ -19,13 +19,13 @@ Use these official references as the source of truth before adding, changing, tr
 
 ## Google Cloud Vision API: Face Detection
 
-- **Role in TrueFit**: The person-photo validity gate. The Express proxy checks that the user-uploaded person photo includes a detectable face before any try-on vendor request. No face, low confidence, malformed response, or failed request blocks generation.
+- **Role in FitLoom**: The person-photo validity gate. The Express proxy checks that the user-uploaded person photo includes a detectable face before any try-on vendor request. No face, low confidence, malformed response, or failed request blocks generation.
 - **Official documentation**: [Detect faces](https://cloud.google.com/vision/docs/detecting-faces)
 - **Integration rule**: Use face presence as a safety/input-quality gate only. Do not claim identity verification, age detection, or minor detection.
 
 ## Google Cloud Vision API: SafeSearch
 
-- **Role in TrueFit**: The structural image-safety gate. The Express proxy uses SafeSearch on each input image before YouCam and on the generated image before it is returned or saved.
+- **Role in FitLoom**: The structural image-safety gate. The Express proxy uses SafeSearch on each input image before YouCam and on the generated image before it is returned or saved.
 - **Official documentation**: [Detect explicit content (SafeSearch)](https://cloud.google.com/vision/docs/detecting-safe-search)
 - **Required documentation checks**: authentication setup, request limits, supported input transport, `SAFE_SEARCH_DETECTION`, likelihood values, response errors, and SDK/API version.
 - **Integration rule**: Define and test explicit block thresholds for `adult`, `racy`, `violence`, `medical`, and `spoof`. An unknown, missing, malformed, or failed response blocks the request.

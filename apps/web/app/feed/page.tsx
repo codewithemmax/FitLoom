@@ -45,7 +45,7 @@ const FeedPage = async (): Promise<React.ReactElement> => {
         <div>
           <p className="eyebrow">The fitting room / community</p>
           <h1 id="feed-title">Looks worth talking about.</h1>
-          <p className="lede">See how the TrueFit community is exploring pieces, and read the detailed fit review behind every shared look.</p>
+          <p className="lede">See how the FitLoom community is exploring pieces, and read the detailed fit review behind every shared look.</p>
         </div>
       </div>
 
@@ -66,7 +66,7 @@ const FeedPage = async (): Promise<React.ReactElement> => {
               </div>
               <div className="feed-post-content">
                 <div className="feed-post-meta">
-                  <span>TrueFit community</span>
+                  <span>FitLoom community</span>
                   <time dateTime={post.published_at}>{formatDate(post.published_at)}</time>
                 </div>
                 <h2>{title}</h2>

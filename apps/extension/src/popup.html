@@ -3,13 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TrueFit</title>
+  <title>FitLoom</title>
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
   <main class="shell">
     <header class="brand-header">
-      <div class="brand-lockup"><img class="brand-logo" src="truefit-logo.png" alt="" /><span>TrueFit</span></div>
+      <!-- Square icon mark, not the wide lockup: the lockup already contains the
+           wordmark and squashes when forced into a square box. -->
+      <div class="brand-lockup"><img class="brand-logo" src="icon-128.png" alt="" width="128" height="128" /><span>FitLoom</span></div>
       <p class="eyebrow">Virtual fitting room</p>
       <h1>See the look on you.</h1>
       <p class="lede">Bring any product page into your wardrobe and preview how it could look on your own body.</p>
@@ -47,7 +49,7 @@
         <p class="eyebrow">Your fitting room</p>
         <h2 id="result-title">Your look, visualized</h2>
         <div id="visualSkeleton" class="result-skeleton hidden" aria-hidden="true"></div>
-        <img id="resultImage" alt="Approved TrueFit try-on result" class="hidden" />
+        <img id="resultImage" alt="Approved FitLoom try-on result" class="hidden" />
       </div>
       <article class="note-pane" aria-labelledby="note-title">
         <h2 id="note-title">AI wardrobe review</h2>

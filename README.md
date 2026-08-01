@@ -1,6 +1,6 @@
-# TrueFit
+# FitLoom
 
-TrueFit is a consent-first virtual try-on MVP for online fashion discovery. It pairs a moderated visual try-on result with a Gemini-generated Fit-Physics Note so shoppers can understand likely stretch, structure, pressure points, and uncertainty without treating AI imagery as a guaranteed size or physical-fit simulation.
+FitLoom is a consent-first virtual try-on MVP for online fashion discovery. It pairs a moderated visual try-on result with a Gemini-generated Fit-Physics Note so shoppers can understand likely stretch, structure, pressure points, and uncertainty without treating AI imagery as a guaranteed size or physical-fit simulation.
 
 ## What is in this repo
 
@@ -74,7 +74,7 @@ SUPABASE_RESULTS_BUCKET=try-on-results
 Edit `apps/extension/src/config.js` if the API is not running locally at `http://localhost:4000`.
 
 ```js
-export const TRUEFIT_API_BASE_URL = 'http://localhost:4000';
+export const FITLOOM_API_BASE_URL = 'http://localhost:4000';
 ```
 
 ## How to get keys
@@ -95,7 +95,7 @@ export const TRUEFIT_API_BASE_URL = 'http://localhost:4000';
 #  Project Structure
 
 ```
-truefit/
+fitloom/
 │
 ├── extension/
 │   ├── popup/
@@ -125,7 +125,7 @@ truefit/
 
 #  Safety & Privacy
 
-TrueFit was designed with user privacy as a priority.
+FitLoom was designed with user privacy as a priority.
 
 - Images are processed in memory only.
 - Photos are never permanently stored.
@@ -137,7 +137,7 @@ TrueFit was designed with user privacy as a priority.
 
 #  Edge Cases
 
-TrueFit gracefully handles situations such as:
+FitLoom gracefully handles situations such as:
 
 - Unsupported garments
 - Failed image scraping
@@ -175,13 +175,13 @@ Planned:
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/truefit.git
+git clone https://github.com/yourusername/fitloom.git
 ```
 
 Navigate into the project:
 
 ```bash
-cd truefit
+cd fitloom
 ```
 
 Install dependencies:
@@ -232,7 +232,7 @@ GOOGLE_VISION_API_KEY=
 
 #  Impact
 
-TrueFit aims to:
+FitLoom aims to:
 
 - Reduce online clothing returns
 - Improve shopping confidence

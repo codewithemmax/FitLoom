@@ -42,7 +42,7 @@ export const PostEngagement = ({
           <span className="sr-only">comments</span>
         </span>
         <ShareButton postId={postId} title={title} />
-        <DownloadButton path={`/api/v1/wardrobe/${savedTryOnId}/download`} filename={`truefit-${postId}.jpg`} />
+        <DownloadButton path={`/api/v1/wardrobe/${savedTryOnId}/download`} filename={`fitloom-${postId}.jpg`} />
       </div>
 
       <div className="comments">

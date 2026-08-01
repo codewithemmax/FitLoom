@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create the Express/TypeScript service foundation that accepts only authenticated, validated TrueFit requests and exposes a safe health check. This unit establishes the security boundary before media or AI work begins.
+Create the Express/TypeScript service foundation that accepts only authenticated, validated FitLoom requests and exposes a safe health check. This unit establishes the security boundary before media or AI work begins.
 
 ## Design
 

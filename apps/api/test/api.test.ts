@@ -6,7 +6,7 @@ import type { SupabaseAuthService } from '../src/services/supabase-auth-service.
 
 const createTestApp = (authService: SupabaseAuthService): ReturnType<typeof createApp> => createApp({ authService });
 
-describe('TrueFit API foundation', (): void => {
+describe('FitLoom API foundation', (): void => {
   it('returns a safe success envelope from the health endpoint', async (): Promise<void> => {
     const app = createTestApp({ getVerifiedUser: async (): Promise<null> => null });
 

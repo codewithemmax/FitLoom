@@ -21,7 +21,7 @@ const OnboardingPage = async (): Promise<React.ReactElement> => {
     <section className="panel" aria-labelledby="consent-title">
       <p className="eyebrow">Step 1 of 2</p>
       <h1 id="consent-title">Consent and photo safety</h1>
-      <p className="lede">TrueFit processes try-on photos transiently. Saved wardrobe items are stored only when you explicitly choose to save a result.</p>
+      <p className="lede">FitLoom processes try-on photos transiently. Saved wardrobe items are stored only when you explicitly choose to save a result.</p>
       <div className="guidance-grid">
         <article>
           <h2>Base-photo setup</h2>

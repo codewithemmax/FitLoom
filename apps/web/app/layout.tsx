@@ -5,12 +5,12 @@ import { signOut } from './actions';
 import './styles.css';
 
 export const metadata: Metadata = {
-  title: 'TrueFit Wardrobe',
+  title: 'FitLoom Wardrobe',
   description: 'Consent-first virtual try-on wardrobe.',
   icons: {
-    icon: '/truefit-logo.png',
-    shortcut: '/truefit-logo.png',
-    apple: '/truefit-logo.png',
+    icon: '/fitloom-logo.png',
+    shortcut: '/fitloom-logo.png',
+    apple: '/fitloom-logo.png',
   },
 };
 
@@ -21,9 +21,9 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>): Reac
         <div className="app-shell site-header-inner">
           {/* The logo is a full lockup that already carries the wordmark, so the
               header shows it at its own 669x373 ratio instead of a second
-              "TrueFit" set in a different typeface. */}
-          <Link className="brand" href="/wardrobe" aria-label="TrueFit wardrobe">
-            <img className="brand-logo" src="/truefit-logo.png" alt="" width="669" height="373" />
+              "FitLoom" set in a different typeface. */}
+          <Link className="brand" href="/wardrobe" aria-label="FitLoom wardrobe">
+            <img className="brand-logo" src="/fitloom-logo.png" alt="" width="669" height="373" />
             <span className="brand-tagline">AI try-on wardrobe</span>
           </Link>
           <nav aria-label="Primary navigation">

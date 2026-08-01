@@ -1,6 +1,12 @@
 import { requestTryOn, saveToWardrobe } from './api-client.js';
-import { TRUEFIT_WEB_APP_URL } from './config.js';
+import { FITLOOM_WEB_APP_URL } from './config.js';
 import { validateCandidate } from './contracts.js';
+
+const SESSION_KEY = 'fitloom-session';
+// chrome.storage.session is memory-only and cleared when the browser closes, so
+// nothing sensitive is ever written to disk. The person photo is deliberately
+// never stored, and file inputs cannot be restored programmatically anyway.
+const MAX_PERSISTED_RESULT_BYTES = 2 * 1024 * 1024;
 
 const state = {
   mode: 'idle',
@@ -50,13 +56,61 @@ const setMode = (mode) => {
   elements.saveButton.disabled = mode !== 'success' || !state.result?.resultId;
 };
 
+const sessionStorageArea = () => {
+  try {
+    return chrome.storage?.session ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const persistSession = async () => {
+  const area = sessionStorageArea();
+  if (area === null) return;
+
+  // Skip very large results rather than blowing the session storage quota.
+  const result =
+    state.result !== null && (state.result.imageBase64?.length ?? 0) <= MAX_PERSISTED_RESULT_BYTES
+      ? state.result
+      : null;
+
+  try {
+    await area.set({
+      [SESSION_KEY]: { token: state.token, candidate: state.candidate, confirmed: state.confirmed, result },
+    });
+  } catch {
+    // A full or unavailable session store must never break the flow.
+  }
+};
+
+const clearPersistedSession = async () => {
+  const area = sessionStorageArea();
+  if (area === null) return;
+
+  try {
+    await area.remove(SESSION_KEY);
+  } catch {
+    // Nothing to recover from here.
+  }
+};
+
+const showCandidate = (candidate) => {
+  elements.candidateImage.src = candidate.imageUrl;
+  elements.candidateTitle.textContent = candidate.title;
+  elements.candidateCategory.textContent = candidate.category;
+  elements.candidateMetadata.textContent = candidate.metadata || candidate.sizeHints || 'No material details detected.';
+  elements.confirmPanel.classList.remove('hidden');
+};
+
 const clearSessionState = () => {
   state.mode = 'idle';
   state.candidate = null;
   state.confirmed = false;
   state.basePhoto = null;
+  state.token = '';
   state.result = null;
   elements.basePhoto.value = '';
+  elements.apiToken.value = '';
   elements.confirmPanel.classList.add('hidden');
   elements.resultPanel.classList.add('hidden');
   elements.resultImage.removeAttribute('src');
@@ -65,6 +119,7 @@ const clearSessionState = () => {
   elements.saveButton.disabled = true;
   setMode('idle');
   setStatus('Session cleared. No media was written to extension storage.');
+  void clearPersistedSession();
 };
 
 const validatePersonPhoto = () => {
@@ -84,23 +139,49 @@ const validatePersonPhoto = () => {
     elements.photoHint.dataset.tone = 'error';
     return false;
   }
-  elements.photoHint.textContent = 'Photo selected. TrueFit will check that it shows a real person before generation.';
+  elements.photoHint.textContent = 'Photo selected. FitLoom will check that it shows a real person before generation.';
   elements.photoHint.dataset.tone = 'success';
   return true;
 };
 
 const activeTab = async () => {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id) throw new Error('No active tab is available.');
+  if (!tab?.id) throw new Error('NO_ACTIVE_TAB');
   return tab;
+};
+
+/** Chrome refuses injection on its own pages, the Web Store, and the PDF viewer. */
+const describeScanFailure = (error) => {
+  const message = String(error?.message ?? error ?? '');
+  if (message === 'NO_ACTIVE_TAB') return 'No active tab is available. Open a product page and try again.';
+  if (/cannot be scripted|Cannot access|chrome:\/\/|extension:\/\/|Extension manifest/iu.test(message)) {
+    return 'FitLoom cannot read this page. Open a product page on a regular website and try again.';
+  }
+  return 'This page could not be scanned. Reload the product page and try again.';
 };
 
 const detectGarment = async () => {
   setMode('idle');
   setStatus('Scanning this page for a supported product…');
-  const tab = await activeTab();
-  const response = await chrome.tabs.sendMessage(tab.id, { type: 'TRUEFIT_DETECT_GARMENT' });
-  const validation = validateCandidate(response?.candidate);
+
+  let injected;
+
+  try {
+    const tab = await activeTab();
+    [injected] = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['src/content-script.js'],
+    });
+  } catch (error) {
+    state.candidate = null;
+    state.confirmed = false;
+    elements.confirmPanel.classList.add('hidden');
+    setMode('error');
+    setStatus(describeScanFailure(error), 'error');
+    return;
+  }
+
+  const validation = validateCandidate(injected?.result);
 
   if (!validation.ok) {
     state.candidate = null;
@@ -108,19 +189,17 @@ const detectGarment = async () => {
     elements.confirmPanel.classList.add('hidden');
     setMode('blocked');
     setStatus(validation.error, 'blocked');
+    await persistSession();
     return;
   }
 
   state.candidate = validation.candidate;
   state.confirmed = false;
-  elements.candidateImage.src = validation.candidate.imageUrl;
-  elements.candidateTitle.textContent = validation.candidate.title;
-  elements.candidateCategory.textContent = validation.candidate.category;
-  elements.candidateMetadata.textContent = validation.candidate.metadata || validation.candidate.sizeHints || 'No material details detected.';
-  elements.confirmPanel.classList.remove('hidden');
+  showCandidate(validation.candidate);
   elements.generateButton.disabled = true;
   setMode('confirming');
   setStatus('Review the product details before bringing it into your look.');
+  await persistSession();
 };
 
 const confirmCandidate = () => {
@@ -128,6 +207,7 @@ const confirmCandidate = () => {
   state.confirmed = true;
   elements.generateButton.disabled = false;
   setStatus('Product confirmed. Preview the look when you are ready.');
+  void persistSession();
 };
 
 const renderFitNote = (note) => {
@@ -162,6 +242,8 @@ const renderFitNote = (note) => {
   }
 };
 
+const blockedCodes = new Set(['SAFETY_BLOCKED', 'PERSON_PHOTO_INVALID']);
+
 const generateFit = async () => {
   state.token = elements.apiToken.value.trim();
   state.basePhoto = elements.basePhoto.files?.[0] ?? null;
@@ -181,13 +263,18 @@ const generateFit = async () => {
     elements.resultImage.src = `data:${result.mimeType};base64,${result.imageBase64}`;
     renderFitNote(result.fitPhysicsNote);
     setMode('success');
-    setStatus('Your look is ready. Save it privately or continue in the TrueFit community.');
+    setStatus('Your look is ready. Save it privately or continue in the FitLoom community.');
+    await persistSession();
   } catch (error) {
     state.result = null;
     elements.resultImage.removeAttribute('src');
     elements.fitNote.replaceChildren();
-    setMode(error?.code === 'SAFETY_BLOCKED' ? 'blocked' : 'error');
-    setStatus(error?.message || 'Try-on failed. You can retry after checking the detected garment and person photo.', error?.code === 'SAFETY_BLOCKED' ? 'blocked' : 'error');
+    const blocked = blockedCodes.has(error?.code);
+    setMode(blocked ? 'blocked' : 'error');
+    setStatus(
+      error?.message || 'Try-on failed. You can retry after checking the detected garment and person photo.',
+      blocked ? 'blocked' : 'error',
+    );
   } finally {
     state.basePhoto = null;
   }
@@ -207,6 +294,51 @@ const saveResult = async () => {
   }
 };
 
+/**
+ * Chrome destroys the popup whenever it loses focus, so the token, the confirmed
+ * garment, and the last result are rehydrated here. Only the person photo has to
+ * be picked again.
+ */
+const restoreSession = async () => {
+  const area = sessionStorageArea();
+  if (area === null) return;
+
+  let saved;
+
+  try {
+    ({ [SESSION_KEY]: saved } = await area.get(SESSION_KEY));
+  } catch {
+    return;
+  }
+
+  if (!saved) return;
+
+  state.token = saved.token ?? '';
+  state.candidate = saved.candidate ?? null;
+  state.confirmed = Boolean(saved.confirmed);
+  state.result = saved.result ?? null;
+  elements.apiToken.value = state.token;
+
+  if (state.candidate !== null) {
+    showCandidate(state.candidate);
+    elements.generateButton.disabled = !state.confirmed;
+  }
+
+  if (state.result !== null) {
+    elements.resultPanel.classList.remove('hidden');
+    elements.resultImage.src = `data:${state.result.mimeType};base64,${state.result.imageBase64}`;
+    renderFitNote(state.result.fitPhysicsNote);
+    setMode('success');
+    setStatus('Restored your last look. Choose your photo again to generate a new one.');
+    return;
+  }
+
+  if (state.candidate !== null) {
+    setMode(state.confirmed ? 'confirming' : 'idle');
+    setStatus('Restored this session. Choose your photo again to preview the look.');
+  }
+};
+
 elements.detectButton.addEventListener('click', () => void detectGarment());
 elements.confirmButton.addEventListener('click', confirmCandidate);
 elements.cancelButton.addEventListener('click', clearSessionState);
@@ -215,6 +347,12 @@ elements.retryButton.addEventListener('click', () => void detectGarment());
 elements.generateButton.addEventListener('click', () => void generateFit());
 elements.saveButton.addEventListener('click', () => void saveResult());
 elements.basePhoto.addEventListener('change', validatePersonPhoto);
-elements.communityButton.addEventListener('click', () => {
-  void chrome.tabs.create({ url: `${TRUEFIT_WEB_APP_URL}/feed` });
+elements.apiToken.addEventListener('change', () => {
+  state.token = elements.apiToken.value.trim();
+  void persistSession();
 });
+elements.communityButton.addEventListener('click', () => {
+  void chrome.tabs.create({ url: `${FITLOOM_WEB_APP_URL}/feed` });
+});
+
+void restoreSession();

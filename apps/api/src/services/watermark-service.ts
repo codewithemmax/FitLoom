@@ -10,11 +10,11 @@ const escapeXml = (value: string): string =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 /**
- * Composites the TrueFit mark onto a generated result. The vendor returns clean
+ * Composites the FitLoom mark onto a generated result. The vendor returns clean
  * images — there is no watermark option on the YouCam API — so branding is
  * applied here, at download time, leaving the stored original untouched.
  */
-export const createWatermarkService = (label = 'TrueFit'): WatermarkService => ({
+export const createWatermarkService = (label = 'FitLoom'): WatermarkService => ({
   async applyWatermark(image: Buffer): Promise<WatermarkedImage> {
     const metadata = await sharp(image).metadata();
     const width = metadata.width ?? 1024;

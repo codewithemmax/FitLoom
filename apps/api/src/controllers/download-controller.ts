@@ -27,7 +27,7 @@ export const createCurrentResultDownloadController = (downloadService: ResultDow
       }
 
       const image = await downloadService.downloadCurrentResult(userId, parsed.data);
-      sendImage(response, image, 'truefit-try-on.jpg');
+      sendImage(response, image, 'fitloom-try-on.jpg');
     } catch (error: unknown) {
       next(error);
     }
@@ -45,7 +45,7 @@ export const createSavedResultDownloadController = (downloadService: ResultDownl
       }
 
       const image = await downloadService.downloadSavedResult(userId, parsed.data);
-      sendImage(response, image, 'truefit-look.jpg');
+      sendImage(response, image, 'fitloom-look.jpg');
     } catch (error: unknown) {
       next(error);
     }

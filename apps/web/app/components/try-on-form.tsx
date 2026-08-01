@@ -22,7 +22,7 @@ type TryOnResult = {
   fitPhysicsNote: FitPhysicsNote;
 };
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_TRUEFIT_API_BASE_URL ?? 'http://localhost:4000';
+const apiBaseUrl = process.env.NEXT_PUBLIC_FITLOOM_API_BASE_URL ?? 'http://localhost:4000';
 
 type PreviewFile = { file: File; url: string };
 
@@ -246,10 +246,10 @@ export const TryOnForm = ({ prefillBasePhoto, prefillGarmentImages, onBack }: Tr
             <div className="result-actions">
               <DownloadButton
                 path={`/api/v1/try-ons/${result.resultId}/download`}
-                filename="truefit-try-on.jpg"
+                filename="fitloom-try-on.jpg"
                 label="Download"
               />
-              <span className="result-actions-note">Downloads carry the TrueFit watermark.</span>
+              <span className="result-actions-note">Downloads carry the FitLoom watermark.</span>
             </div>
 
             <div className="post-to-feed">

@@ -33,7 +33,7 @@
 ## Required States
 
 - **No garment found**: explain that the page could not be confidently read and invite the user to choose another product page.
-- **Unsupported garment**: state that TrueFit’s MVP supports tops and outerwear only.
+- **Unsupported garment**: state that FitLoom’s MVP supports tops and outerwear only.
 - **Confirmation required**: show the thumbnail and a clear confirm/cancel pair; no generation call is allowed in this state.
 - **Safety blocked**: show a neutral privacy-respecting message and no unsafe media.
 - **Network/vendor failure**: preserve the confirmed garment details, offer retry only when safe, and never claim a result was generated.
