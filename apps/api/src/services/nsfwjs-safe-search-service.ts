@@ -4,6 +4,10 @@ import type { SafeSearchOutcome, SafeSearchService } from './safe-search-service
 
 type NsfwModel = Awaited<ReturnType<typeof import('nsfwjs')['load']>>;
 
+// nsfwjs ships ESM declarations with extensionless relative imports, which do not resolve
+// under NodeNext, so its exported types degrade to `any`. Declare the shape we rely on.
+export type NsfwPrediction = { className: string; probability: number };
+
 let nsfwModel: NsfwModel | undefined;
 
 export const getNsfwModel = (): NsfwModel | undefined => nsfwModel;
@@ -39,7 +43,7 @@ export const createNsfwjsSafeSearchService = (): SafeSearchService => ({
 
     const tensor = bufferToTensor(image);
     try {
-      const predictions = await model.classify(tensor);
+      const predictions: NsfwPrediction[] = await model.classify(tensor);
       console.debug('[NSFWJS] predictions:', predictions.map((p) => `${p.className}=${p.probability.toFixed(3)}`).join(' '));
 
       const blocked = predictions.find((p) => UNSAFE_CLASSES.has(p.className) && p.probability > 0.5);

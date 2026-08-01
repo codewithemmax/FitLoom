@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs';
 import jpegJs from 'jpeg-js';
 import type { PersonPhotoValidationResult, PersonPhotoValidationService } from './person-photo-validation-service.js';
-import { getNsfwModel } from './nsfwjs-safe-search-service.js';
+import { getNsfwModel, type NsfwPrediction } from './nsfwjs-safe-search-service.js';
 
 const EXPLICIT_CLASSES = new Set(['Porn', 'Hentai', 'Sexy']);
 
@@ -27,7 +27,7 @@ export const createNsfwjsPersonPhotoValidationService = (): PersonPhotoValidatio
 
     const tensor = bufferToTensor(image);
     try {
-      const predictions = await model.classify(tensor);
+      const predictions: NsfwPrediction[] = await model.classify(tensor);
       console.debug('[NSFWJS:PersonValidation] predictions:', predictions.map((p) => `${p.className}=${p.probability.toFixed(3)}`).join(' '));
 
       const explicit = predictions.find((p) => EXPLICIT_CLASSES.has(p.className) && p.probability > 0.5);
