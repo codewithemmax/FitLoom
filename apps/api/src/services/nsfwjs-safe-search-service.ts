@@ -1,6 +1,5 @@
-import * as tf from '@tensorflow/tfjs';
-import jpegJs from 'jpeg-js';
 import type { SafeSearchOutcome, SafeSearchService } from './safe-search-service.js';
+import { decodeImageToTensor } from './image-tensor.js';
 
 type NsfwModel = Awaited<ReturnType<typeof import('nsfwjs')['load']>>;
 
@@ -19,18 +18,6 @@ export const initNsfwModel = async (): Promise<void> => {
   console.info('[NSFWJS] model loaded');
 };
 
-const bufferToTensor = (image: Buffer): tf.Tensor3D => {
-  const decoded = jpegJs.decode(image, { useTArray: true });
-  const numPixels = decoded.width * decoded.height;
-  const values = new Int32Array(numPixels * 3);
-  for (let i = 0; i < numPixels; i++) {
-    values[i * 3]     = decoded.data[i * 4]!;
-    values[i * 3 + 1] = decoded.data[i * 4 + 1]!;
-    values[i * 3 + 2] = decoded.data[i * 4 + 2]!;
-  }
-  return tf.tensor3d(values, [decoded.height, decoded.width, 3], 'int32');
-};
-
 const UNSAFE_CLASSES = new Set(['Porn', 'Hentai', 'Sexy']);
 
 export const createNsfwjsSafeSearchService = (): SafeSearchService => ({
@@ -41,7 +28,7 @@ export const createNsfwjsSafeSearchService = (): SafeSearchService => ({
       return 'indeterminate';
     }
 
-    const tensor = bufferToTensor(image);
+    const tensor = await decodeImageToTensor(image);
     try {
       const predictions: NsfwPrediction[] = await model.classify(tensor);
       console.debug('[NSFWJS] predictions:', predictions.map((p) => `${p.className}=${p.probability.toFixed(3)}`).join(' '));
