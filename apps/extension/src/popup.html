@@ -19,10 +19,29 @@
 
     <section class="status" id="status" role="status" aria-live="polite">Ready to capture this product page.</section>
 
-    <section class="controls" aria-label="Session setup">
-      <div class="section-heading"><span class="step">01</span><div><h2>Make it yours</h2><p>Use a clear photo of yourself. Your face should be visible.</p></div></div>
-      <label for="apiToken">Session access token</label>
-      <input id="apiToken" type="password" autocomplete="off" placeholder="Paste access token" />
+    <section class="controls" id="authPanel" aria-labelledby="auth-title">
+      <div class="section-heading"><span class="step">01</span><div><h2 id="auth-title">Sign in to FitLoom</h2><p>Your looks and wardrobe stay private to your account.</p></div></div>
+      <div class="segmented" role="tablist" aria-label="Sign in or create an account">
+        <button id="signInTab" type="button" role="tab" aria-selected="true">Sign in</button>
+        <button id="signUpTab" type="button" role="tab" aria-selected="false">Create account</button>
+      </div>
+      <form id="authForm" class="form">
+        <label for="authEmail">Email</label>
+        <input id="authEmail" type="email" autocomplete="email" required placeholder="you@example.com" />
+        <label for="authPassword">Password</label>
+        <input id="authPassword" type="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters" />
+        <p id="authHint" class="field-hint">Use the same account as the FitLoom web app.</p>
+        <button id="authSubmit" type="submit">Sign in</button>
+      </form>
+    </section>
+
+    <section class="controls hidden" id="accountPanel" aria-labelledby="account-title">
+      <div class="section-heading"><span class="step">01</span><div><h2 id="account-title">Signed in</h2><p id="accountEmail"></p></div></div>
+      <button id="signOutButton" class="secondary" type="button">Sign out</button>
+    </section>
+
+    <section class="controls hidden" id="setupPanel" aria-label="Session setup">
+      <div class="section-heading"><span class="step">02</span><div><h2>Make it yours</h2><p>Use a clear photo of yourself. Your face should be visible.</p></div></div>
       <label for="basePhoto">Your photo</label>
       <input id="basePhoto" type="file" accept="image/png,image/jpeg,image/webp" />
       <p id="photoHint" class="field-hint">Front-facing, fully clothed, with enough of your outfit visible.</p>
@@ -30,7 +49,7 @@
     </section>
 
     <section id="confirmPanel" class="card hidden" aria-labelledby="confirm-title">
-      <div class="section-heading"><span class="step">02</span><div><h2 id="confirm-title">Review the product</h2><p>Check the item before it becomes part of your look.</p></div></div>
+      <div class="section-heading"><span class="step">03</span><div><h2 id="confirm-title">Review the product</h2><p>Check the item before it becomes part of your look.</p></div></div>
       <img id="candidateImage" alt="Detected garment thumbnail" />
       <dl>
         <dt>Title</dt><dd id="candidateTitle"></dd>

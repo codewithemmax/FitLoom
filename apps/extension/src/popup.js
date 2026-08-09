@@ -1,4 +1,5 @@
 import { requestTryOn, saveToWardrobe } from './api-client.js';
+import { refreshSession, signIn, signOut, signUp } from './auth-client.js';
 import { FITLOOM_WEB_APP_URL } from './config.js';
 import { validateCandidate } from './contracts.js';
 
@@ -7,19 +8,34 @@ const SESSION_KEY = 'fitloom-session';
 // nothing sensitive is ever written to disk. The person photo is deliberately
 // never stored, and file inputs cannot be restored programmatically anyway.
 const MAX_PERSISTED_RESULT_BYTES = 2 * 1024 * 1024;
+// Refresh slightly before expiry so a long try-on cannot start on a token that
+// dies mid-request.
+const TOKEN_REFRESH_MARGIN_MS = 60 * 1000;
 
 const state = {
   mode: 'idle',
+  authMode: 'sign-in',
   candidate: null,
   confirmed: false,
   basePhoto: null,
-  token: '',
+  session: null,
   result: null,
 };
 
 const elements = {
   status: document.querySelector('#status'),
-  apiToken: document.querySelector('#apiToken'),
+  authPanel: document.querySelector('#authPanel'),
+  accountPanel: document.querySelector('#accountPanel'),
+  setupPanel: document.querySelector('#setupPanel'),
+  accountEmail: document.querySelector('#accountEmail'),
+  signInTab: document.querySelector('#signInTab'),
+  signUpTab: document.querySelector('#signUpTab'),
+  authForm: document.querySelector('#authForm'),
+  authEmail: document.querySelector('#authEmail'),
+  authPassword: document.querySelector('#authPassword'),
+  authHint: document.querySelector('#authHint'),
+  authSubmit: document.querySelector('#authSubmit'),
+  signOutButton: document.querySelector('#signOutButton'),
   basePhoto: document.querySelector('#basePhoto'),
   detectButton: document.querySelector('#detectButton'),
   confirmPanel: document.querySelector('#confirmPanel'),
@@ -68,6 +84,11 @@ const persistSession = async () => {
   const area = sessionStorageArea();
   if (area === null) return;
 
+  if (state.session === null && state.candidate === null && state.result === null) {
+    await clearPersistedSession();
+    return;
+  }
+
   // Skip very large results rather than blowing the session storage quota.
   const result =
     state.result !== null && (state.result.imageBase64?.length ?? 0) <= MAX_PERSISTED_RESULT_BYTES
@@ -76,7 +97,7 @@ const persistSession = async () => {
 
   try {
     await area.set({
-      [SESSION_KEY]: { token: state.token, candidate: state.candidate, confirmed: state.confirmed, result },
+      [SESSION_KEY]: { session: state.session, candidate: state.candidate, confirmed: state.confirmed, result },
     });
   } catch {
     // A full or unavailable session store must never break the flow.
@@ -94,6 +115,69 @@ const clearPersistedSession = async () => {
   }
 };
 
+const setAuthHint = (message, tone = '') => {
+  elements.authHint.textContent = message;
+  elements.authHint.dataset.tone = tone;
+};
+
+const renderAuth = () => {
+  const signedIn = state.session !== null;
+
+  elements.authPanel.classList.toggle('hidden', signedIn);
+  elements.accountPanel.classList.toggle('hidden', !signedIn);
+  elements.setupPanel.classList.toggle('hidden', !signedIn);
+
+  if (signedIn) {
+    elements.accountEmail.textContent = state.session.email || 'Your FitLoom account';
+    return;
+  }
+
+  const isSignIn = state.authMode === 'sign-in';
+  elements.signInTab.setAttribute('aria-selected', String(isSignIn));
+  elements.signUpTab.setAttribute('aria-selected', String(!isSignIn));
+  elements.authSubmit.textContent = isSignIn ? 'Sign in' : 'Create account';
+  elements.authPassword.autocomplete = isSignIn ? 'current-password' : 'new-password';
+};
+
+const setAuthMode = (mode) => {
+  state.authMode = mode;
+  setAuthHint(
+    mode === 'sign-in'
+      ? 'Use the same account as the FitLoom web app.'
+      : 'Pick a password of at least 8 characters.',
+  );
+  renderAuth();
+};
+
+const applySession = async (session) => {
+  state.session = session;
+  renderAuth();
+  await persistSession();
+};
+
+/**
+ * Every authenticated call goes through here so an expired access token is
+ * silently refreshed instead of surfacing as a confusing 401 mid-flow.
+ */
+const getAccessToken = async () => {
+  if (state.session === null) return null;
+  if (Date.now() < state.session.expiresAt - TOKEN_REFRESH_MARGIN_MS) return state.session.accessToken;
+
+  if (!state.session.refreshToken) {
+    await applySession(null);
+    return null;
+  }
+
+  try {
+    const refreshed = await refreshSession(state.session.refreshToken);
+    await applySession(refreshed);
+    return refreshed.accessToken;
+  } catch {
+    await applySession(null);
+    return null;
+  }
+};
+
 const showCandidate = (candidate) => {
   elements.candidateImage.src = candidate.imageUrl;
   elements.candidateTitle.textContent = candidate.title;
@@ -102,15 +186,14 @@ const showCandidate = (candidate) => {
   elements.confirmPanel.classList.remove('hidden');
 };
 
+/** Clears the try-on session only. Staying signed in is handled separately. */
 const clearSessionState = () => {
   state.mode = 'idle';
   state.candidate = null;
   state.confirmed = false;
   state.basePhoto = null;
-  state.token = '';
   state.result = null;
   elements.basePhoto.value = '';
-  elements.apiToken.value = '';
   elements.confirmPanel.classList.add('hidden');
   elements.resultPanel.classList.add('hidden');
   elements.resultImage.removeAttribute('src');
@@ -119,7 +202,55 @@ const clearSessionState = () => {
   elements.saveButton.disabled = true;
   setMode('idle');
   setStatus('Session cleared. No media was written to extension storage.');
-  void clearPersistedSession();
+  void persistSession();
+};
+
+const handleAuthSubmit = async (event) => {
+  event.preventDefault();
+
+  const email = elements.authEmail.value.trim();
+  const password = elements.authPassword.value;
+
+  if (!email || password.length < 8) {
+    setAuthHint('Enter your email and a password of at least 8 characters.', 'error');
+    return;
+  }
+
+  elements.authSubmit.disabled = true;
+  setAuthHint(state.authMode === 'sign-in' ? 'Signing in…' : 'Creating your account…');
+
+  try {
+    if (state.authMode === 'sign-in') {
+      await applySession(await signIn({ email, password }));
+    } else {
+      const outcome = await signUp({ email, password });
+
+      if (outcome.status === 'confirmation_required') {
+        // setAuthMode rewrites the hint, so the confirmation notice goes last.
+        setAuthMode('sign-in');
+        setAuthHint('Check your email to confirm the account, then sign in.', 'success');
+        return;
+      }
+
+      await applySession(outcome.session);
+    }
+
+    elements.authForm.reset();
+    setStatus('Signed in. Capture a product page to start a look.', 'success');
+  } catch (error) {
+    setAuthHint(error?.message || 'Sign-in failed. Try again.', 'error');
+  } finally {
+    elements.authSubmit.disabled = false;
+  }
+};
+
+const handleSignOut = async () => {
+  const accessToken = state.session?.accessToken;
+  clearSessionState();
+  await applySession(null);
+  setAuthMode('sign-in');
+  setStatus('Signed out. Nothing from this session was written to disk.');
+  if (accessToken) await signOut(accessToken);
 };
 
 const validatePersonPhoto = () => {
@@ -245,11 +376,17 @@ const renderFitNote = (note) => {
 const blockedCodes = new Set(['SAFETY_BLOCKED', 'PERSON_PHOTO_INVALID']);
 
 const generateFit = async () => {
-  state.token = elements.apiToken.value.trim();
   state.basePhoto = elements.basePhoto.files?.[0] ?? null;
 
-  if (!state.token || !state.basePhoto || !validatePersonPhoto() || !state.candidate || !state.confirmed) {
-    setStatus('Confirm a supported garment, paste a session token, and choose a person photo first.', 'blocked');
+  if (!state.basePhoto || !validatePersonPhoto() || !state.candidate || !state.confirmed) {
+    setStatus('Confirm a supported garment and choose a person photo first.', 'blocked');
+    return;
+  }
+
+  const token = await getAccessToken();
+
+  if (token === null) {
+    setStatus('Your session expired. Sign in again to preview this look.', 'blocked');
     return;
   }
 
@@ -258,7 +395,7 @@ const generateFit = async () => {
   setStatus('Checking your photo and generating the look. This can take a moment.');
 
   try {
-    const result = await requestTryOn({ token: state.token, candidate: state.candidate, basePhoto: state.basePhoto });
+    const result = await requestTryOn({ token, candidate: state.candidate, basePhoto: state.basePhoto });
     state.result = result;
     elements.resultImage.src = `data:${result.mimeType};base64,${result.imageBase64}`;
     renderFitNote(result.fitPhysicsNote);
@@ -281,12 +418,20 @@ const generateFit = async () => {
 };
 
 const saveResult = async () => {
-  if (!state.result?.resultId || !state.token) return;
+  if (!state.result?.resultId) return;
+
+  const token = await getAccessToken();
+
+  if (token === null) {
+    setStatus('Your session expired. Sign in again to save this look.', 'blocked');
+    return;
+  }
+
   elements.saveButton.disabled = true;
   setStatus('Saving approved result to your private wardrobe…');
 
   try {
-    await saveToWardrobe({ token: state.token, resultId: state.result.resultId });
+    await saveToWardrobe({ token, resultId: state.result.resultId });
     setStatus('Saved to wardrobe. Closing clears extension session media.', 'success');
   } catch (error) {
     elements.saveButton.disabled = false;
@@ -295,29 +440,41 @@ const saveResult = async () => {
 };
 
 /**
- * Chrome destroys the popup whenever it loses focus, so the token, the confirmed
- * garment, and the last result are rehydrated here. Only the person photo has to
- * be picked again.
+ * Chrome destroys the popup whenever it loses focus, so the signed-in session,
+ * the confirmed garment, and the last result are rehydrated here. Only the
+ * person photo has to be picked again.
  */
 const restoreSession = async () => {
   const area = sessionStorageArea();
-  if (area === null) return;
+  if (area === null) {
+    renderAuth();
+    return;
+  }
 
   let saved;
 
   try {
     ({ [SESSION_KEY]: saved } = await area.get(SESSION_KEY));
   } catch {
+    renderAuth();
     return;
   }
 
-  if (!saved) return;
+  if (!saved) {
+    renderAuth();
+    return;
+  }
 
-  state.token = saved.token ?? '';
+  state.session = saved.session ?? null;
   state.candidate = saved.candidate ?? null;
   state.confirmed = Boolean(saved.confirmed);
   state.result = saved.result ?? null;
-  elements.apiToken.value = state.token;
+  renderAuth();
+
+  if (state.session === null) {
+    setStatus('Sign in to start a look.');
+    return;
+  }
 
   if (state.candidate !== null) {
     showCandidate(state.candidate);
@@ -347,10 +504,10 @@ elements.retryButton.addEventListener('click', () => void detectGarment());
 elements.generateButton.addEventListener('click', () => void generateFit());
 elements.saveButton.addEventListener('click', () => void saveResult());
 elements.basePhoto.addEventListener('change', validatePersonPhoto);
-elements.apiToken.addEventListener('change', () => {
-  state.token = elements.apiToken.value.trim();
-  void persistSession();
-});
+elements.authForm.addEventListener('submit', (event) => void handleAuthSubmit(event));
+elements.signInTab.addEventListener('click', () => setAuthMode('sign-in'));
+elements.signUpTab.addEventListener('click', () => setAuthMode('sign-up'));
+elements.signOutButton.addEventListener('click', () => void handleSignOut());
 elements.communityButton.addEventListener('click', () => {
   void chrome.tabs.create({ url: `${FITLOOM_WEB_APP_URL}/feed` });
 });

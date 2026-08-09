@@ -41,6 +41,7 @@ Copy `apps/api/.env.example` to `apps/api/.env` and fill in:
 ```env
 NODE_ENV=development
 PORT=4000
+ALLOWED_ORIGINS=http://localhost:3000,chrome-extension://your-extension-id
 
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-or-publishable-key
@@ -69,13 +70,23 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-or-publishable-key
 SUPABASE_RESULTS_BUCKET=try-on-results
 ```
 
-### Extension API URL
+### Extension config
 
-Edit `apps/extension/src/config.js` if the API is not running locally at `http://localhost:4000`.
+Edit `apps/extension/src/config.js`. The extension has no build step, so these are
+plain values rather than environment variables.
 
 ```js
 export const FITLOOM_API_BASE_URL = 'http://localhost:4000';
+export const FITLOOM_SUPABASE_URL = 'https://your-project.supabase.co';
+export const FITLOOM_SUPABASE_ANON_KEY = 'your-supabase-anon-or-publishable-key';
 ```
+
+The extension signs users in against Supabase directly with the publishable anon
+key, exactly as the web app does. Only the resulting bearer token is sent to the
+FitLoom API. Never place the service-role key here.
+
+Add `chrome-extension://<your-extension-id>` to the API's `ALLOWED_ORIGINS` or
+try-on requests from the popup are blocked by CORS.
 
 ## How to get keys
 

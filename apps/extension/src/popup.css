@@ -35,7 +35,12 @@ h3 { font-size: 14px; margin: 12px 0 4px; }
 .status[data-tone="blocked"], .status[data-tone="error"] { border-color: var(--danger); color: var(--danger); }
 .status[data-tone="success"] { border-color: var(--ok); color: var(--ok); }
 
-.controls, .card { display: grid; gap: 11px; }
+.controls, .card, .form { display: grid; gap: 11px; }
+.form { gap: 9px; }
+.segmented { display: flex; gap: 6px; }
+.segmented button { background: transparent; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); flex: 1; }
+.segmented button[aria-selected="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+#accountEmail { overflow-wrap: anywhere; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px; }
 .hidden { display: none !important; }
 
