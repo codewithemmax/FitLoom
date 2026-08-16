@@ -311,7 +311,7 @@ git push origin feature/amazing-feature
 ---
 
 
-# 📄 License
+#  License
 
  MIT 
 
