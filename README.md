@@ -2,6 +2,36 @@
 
 FitLoom is a consent-first virtual try-on MVP for online fashion discovery. It pairs a moderated visual try-on result with a Gemini-generated Fit-Physics Note so shoppers can understand likely stretch, structure, pressure points, and uncertainty without treating AI imagery as a guaranteed size or physical-fit simulation.
 
+<p align="center">
+
+  <strong>Virtual try-on tells you how it looks. Fitloom helps you understand how it fits.</strong>
+
+</p>
+
+<p align="center">
+
+ 
+
+</p>
+
+<p align="center">
+
+  <img src="https://img.shields.io/badge/Status-Hackathon%20MVP-orange" alt="Status">
+
+  <img src="https://img.shields.io/badge/AI-Gemini-blue" alt="Gemini">
+
+  <img src="https://img.shields.io/badge/Virtual%20Try--On-YouCam-purple" alt="YouCam">
+
+  <img src="https://img.shields.io/badge/Safety-Google%20Cloud%20Vision-green" alt="Google Cloud Vision">
+
+  <img src="https://img.shields.io/badge/Platform-Chrome%20Extension-yellow" alt="Chrome Extension">
+
+</p>
+
+
+
+___
+
 ## What is in this repo
 
 | Path | Purpose |
@@ -284,10 +314,6 @@ git push origin feature/amazing-feature
 # 📄 License
 
  MIT 
-
----
-
-## If you found this project interesting, consider giving it a star!
 
 
 
